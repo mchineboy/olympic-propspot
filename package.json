@@ -43,7 +43,9 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"firebase": "^10.12.3",
-		"sveltefire": "^0.4.5"
+		"firebase": "^9.23.0",
+		"svelte-pieces": "^2.0.0-next.14",
+		"sveltefire": "^0.4.5",
+		"sveltefirets": "^0.0.42"
 	}
 }

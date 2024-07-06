@@ -4,5 +4,5 @@
 {#if $user}
   <slot user={$user} />
 {:else}
-  <slot name="login" />
+  <slot name="login">Login?</slot>
 {/if}

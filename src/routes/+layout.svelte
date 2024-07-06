@@ -1,7 +1,7 @@
 <script lang="ts">
 	import AuthCheck from '$lib/AuthCheck.svelte';
-	import Login from '$lib/Login.svelte';
-	// Other imports...
+	import Login from '$lib/Login.svelte';  
+    import "../app.css";
 </script>
 
 <AuthCheck>

@@ -5,6 +5,7 @@
     import { signOut } from 'firebase/auth';
     import { auth } from '$lib/firebase.client';
     import Nav from '../components/Nav.svelte';
+	import "../app.css";
 
     import type { LayoutData } from './$types';
     export let data: LayoutData;

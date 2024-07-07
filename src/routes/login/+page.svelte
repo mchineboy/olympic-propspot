@@ -5,7 +5,8 @@
 	  GoogleAuthProvider,
 	  signInWithPopup,
 	  signInWithEmailAndPassword,
-	  type UserCredential
+	  type UserCredential,
+	  type User
 	} from 'firebase/auth';
 	import { goto } from '$app/navigation';
   
@@ -14,48 +15,67 @@
 	let loading: boolean = false;
 	let error: string = '';
   
-	async function loginWithMail() {
+	interface SessionUser {
+	  displayName: string | null;
+	  email: string | null;
+	  photoURL: string | null;
+	  uid: string;
+	}
+  
+	interface SessionData {
+	  loggedIn: boolean;
+	  user: SessionUser;
+	}
+  
+	function createSessionUser(user: User): SessionUser {
+	  return {
+		displayName: user.displayName,
+		email: user.email,
+		photoURL: user.photoURL,
+		uid: user.uid
+	  };
+	}
+  
+	async function loginWithMail(): Promise<void> {
 	  loading = true;
 	  error = '';
 	  try {
-		const result = await signInWithEmailAndPassword(auth, email, password);
-		const { user }: UserCredential = result;
-		session.set({
+		const result: UserCredential = await signInWithEmailAndPassword(auth, email, password);
+		const sessionData: SessionData = {
 		  loggedIn: true,
-		  user: {
-			displayName: user?.displayName,
-			email: user?.email,
-			photoURL: user?.photoURL,
-			uid: user?.uid
-		  }
-		});
+		  user: createSessionUser(result.user)
+		};
+		session.set(sessionData);
 		goto('/');
-	  } catch (e) {
-		error = e.message;
+	  } catch (e: unknown) {
+		if (e instanceof Error) {
+		  error = e.message;
+		} else {
+		  error = 'An unknown error occurred';
+		}
 	  } finally {
 		loading = false;
 	  }
 	}
   
-	async function loginWithGoogle() {
+	async function loginWithGoogle(): Promise<void> {
 	  loading = true;
 	  error = '';
 	  try {
-		const provider = new GoogleAuthProvider();
-		const result = await signInWithPopup(auth, provider);
-		const { displayName, email, photoURL, uid } = result?.user;
-		session.set({
+		const provider: GoogleAuthProvider = new GoogleAuthProvider();
+		const result: UserCredential = await signInWithPopup(auth, provider);
+		const sessionData: SessionData = {
 		  loggedIn: true,
-		  user: {
-			displayName,
-			email,
-			photoURL,
-			uid
-		  }
-		});
+		  user: createSessionUser(result.user)
+		};
+		session.set(sessionData);
 		goto('/');
-	  } catch (e) {
-		error = e.message;
+	  } catch (e: unknown) {
+		if (e instanceof Error) {
+		  error = e.message;
+		} else {
+		  error = 'An unknown error occurred';
+		}
 	  } finally {
 		loading = false;
 	  }

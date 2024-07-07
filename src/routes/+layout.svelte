@@ -4,6 +4,7 @@
 	import { goto } from '$app/navigation';
 	import { signOut } from 'firebase/auth';
 	import { auth } from '$lib/firebase.client';
+    import Nav from '../components/Nav.svelte';
 
 	import type { LayoutData } from './$types';
 	export let data: LayoutData;
@@ -46,7 +47,7 @@
 			});
 	}
 </script>
-
+<Nav/>
 {#if loading}
 	<div>Loading...</div>
 {:else}

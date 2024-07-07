@@ -1,1 +1,1 @@
-<h1>Welcome to Sveltekit Auth Firebase</h1>
+<h1>Welcome</h1>

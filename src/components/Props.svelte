@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { props } from './propsStore';
+	import { props } from '../lib/propsStore';
 </script>
 
 <slot posts={$props} />

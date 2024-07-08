@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { session } from '$lib/session';
-	import { auth } from '$lib/firebase.client';
+	import { auth, initializeFirebase } from '$lib/firebase.client';
 	import {
 		GoogleAuthProvider,
 		signInWithPopup,
@@ -27,6 +27,8 @@
 		loggedIn: boolean;
 		user: SessionUser;
 	}
+
+	initializeFirebase();
 
 	function createSessionUser(user: User): SessionUser {
 		return {

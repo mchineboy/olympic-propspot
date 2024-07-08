@@ -69,7 +69,7 @@
 			</div>
 
 			<h1 class="text-4xl font-bold text-purple-800 mb-4">Olympic PropSpot</h1>
-			<p class="text-xl text-purple-600 mb-8">Welcome to the Royal Theatre of Props</p>
+			<p class="text-xl text-purple-600 mb-8">Theatri Thesauros Tenemus</p>
 
 			<div class="space-y-4">
 				<button

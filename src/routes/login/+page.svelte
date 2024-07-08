@@ -105,18 +105,19 @@
 				user: createSessionUser(result.user)
 			};
 
-			const userProfile = await getUserProfile();
+			// const userProfile = await getUserProfile();
 
-			if (userProfile) {
-				sessionData.user = { ...sessionData.user, ...userProfile };
-				session.set(sessionData);
-				goto('/dashboard');
-			} else {
-				// Handle case where user is not found
-				goto('/login');
-			}
+			// // if (userProfile) {
+			// // 	sessionData.user = { ...sessionData.user, ...userProfile };
+			// // 	session.set(sessionData);
+			// // 	goto('/dashboard');
+			// // } else {
+			// // 	// Handle case where user is not found
+			// // 	goto('/login');
+			// // }
+			goto('/dashboard')
 		} catch (e: unknown) {
-			console.error(e);
+			console.trace(e);
 
 			if (e instanceof Error) {
 				error = e.message;

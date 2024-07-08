@@ -84,7 +84,9 @@
 			session.set(sessionData);
 			goto('/');
 		} catch (e: unknown) {
+			
 			console.trace(e);
+
 			if (e instanceof Error) {
 				error = e.message;
 			} else {

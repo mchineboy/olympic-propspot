@@ -64,7 +64,7 @@
 				<div
 					class="w-32 h-32 mx-auto bg-purple-200 rounded-full flex items-center justify-center text-purple-600"
 				>
-					<span class="text-4xl font-bold">LOGO</span>
+                <img class="w-auto h-fit" src="/images/olympic-propspot-high-resolution-logo-white-transparent.svg" alt="Logo">
 				</div>
 			</div>
 

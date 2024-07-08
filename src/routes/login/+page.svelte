@@ -84,6 +84,7 @@
 			session.set(sessionData);
 			goto('/');
 		} catch (e: unknown) {
+			console.trace(e);
 			if (e instanceof Error) {
 				error = e.message;
 			} else {
@@ -143,7 +144,7 @@
 							bind:checked={rememberMe}
 							class="w-4 h-4 text-yellow-400 border-yellow-500 rounded focus:ring-yellow-500"
 						/>
-						<label for="remember-me" class="ml-2 block text-sm text-yellow-400">
+						<label for="remember-me" class="block ml-2 text-sm text-yellow-400">
 							Remember me
 						</label>
 					</div>
@@ -159,7 +160,7 @@
 					disabled={loading}
 				>
 					{#if loading}
-						<span class="inline-block animate-spin mr-2">🎭</span>
+						<span class="inline-block mr-2 animate-spin">🎭</span>
 						Loading...
 					{:else}
 						Take the Stage

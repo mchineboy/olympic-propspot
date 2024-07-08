@@ -9,6 +9,7 @@
 		type User
 	} from 'firebase/auth';
 	import { goto } from '$app/navigation';
+	import { users } from '$lib/users';
 
 	let email: string = '';
 	let password: string = '';
@@ -57,11 +58,22 @@
 				loggedIn: true,
 				user: createSessionUser(result.user)
 			};
-			session.set(sessionData);
-			if (rememberMe) {
-				// Implement remember me functionality
+
+			// From the user_profiles table in firebase, get their profile and add it to the sessionData
+			if (!sessionData.user.email) {
+				throw new Error('User email not found');
 			}
-			goto('/');
+			const userProfile = await users.getUserByEmail(sessionData.user.email);
+			if (userProfile) {
+				sessionData.user = { ...sessionData.user, ...userProfile };
+				session.set(sessionData);
+				if (rememberMe) {
+					// Implement remember me functionality
+				}
+				goto('/dashboard');
+			} else {
+				// Handle case where user is not found
+			}
 		} catch (e: unknown) {
 			if (e instanceof Error) {
 				error = e.message;
@@ -86,7 +98,6 @@
 			session.set(sessionData);
 			goto('/');
 		} catch (e: unknown) {
-			
 			console.trace(e);
 
 			if (e instanceof Error) {

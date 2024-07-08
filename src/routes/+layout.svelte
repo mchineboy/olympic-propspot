@@ -73,7 +73,7 @@
 
 			<div class="space-y-4">
 				<button
-					class="w-full bg-gold-500 text-white py-3 px-6 rounded-lg text-lg font-semibold hover:bg-gold-600 transition-colors duration-300 shadow-md"
+					class="w-full bg-yellow-500 text-white py-3 px-6 rounded-lg text-lg font-semibold hover:bg-yellow-600 transition-colors duration-300 shadow-md"
 					on:click={() => goto('/login')}
 				>
 					Log In

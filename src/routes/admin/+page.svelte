@@ -94,7 +94,7 @@
                         <span>Can Delete</span>
                     </label>
                 </div>
-                <button type="submit" class="bg-gold-500 text-white px-4 py-2 rounded hover:bg-gold-600 transition-colors">Invite User</button>
+                <button type="submit" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition-colors">Invite User</button>
             </form>
         </div>
     

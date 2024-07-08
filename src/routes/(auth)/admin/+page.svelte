@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { props, type UserProfile } from '$lib/users';
+    import { users as props, type UserProfile } from '$lib/users';
     import { addDoc, collection, updateDoc, doc, deleteDoc } from 'firebase/firestore';
     import { firestore } from '$lib/firebase';
     
@@ -64,11 +64,11 @@
     }
     </script>
     
-    <div class="container mx-auto px-4 py-8">
-        <h1 class="text-4xl font-bold text-purple-800 mb-8">User Management</h1>
+    <div class="container px-4 py-8 mx-auto">
+        <h1 class="mb-8 text-4xl font-bold text-purple-800">User Management</h1>
     
-        <div class="bg-purple-100 p-6 rounded-lg shadow-md mb-8">
-            <h2 class="text-2xl font-semibold text-purple-700 mb-4">Invite New User</h2>
+        <div class="p-6 mb-8 bg-purple-100 rounded-lg shadow-md">
+            <h2 class="mb-4 text-2xl font-semibold text-purple-700">Invite New User</h2>
             <form on:submit|preventDefault={inviteUser} class="space-y-4">
                 <input type="text" placeholder="Name" bind:value={newUser.name} required class="w-full p-2 border border-purple-300 rounded">
                 <input type="email" placeholder="Email" bind:value={newUser.email} required class="w-full p-2 border border-purple-300 rounded">
@@ -94,12 +94,12 @@
                         <span>Can Delete</span>
                     </label>
                 </div>
-                <button type="submit" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition-colors">Invite User</button>
+                <button type="submit" class="px-4 py-2 text-white transition-colors bg-yellow-500 rounded hover:bg-yellow-600">Invite User</button>
             </form>
         </div>
     
-        <div class="bg-white p-6 rounded-lg shadow-md">
-            <h2 class="text-2xl font-semibold text-purple-700 mb-4">Existing Users</h2>
+        <div class="p-6 bg-white rounded-lg shadow-md">
+            <h2 class="mb-4 text-2xl font-semibold text-purple-700">Existing Users</h2>
             <div class="overflow-x-auto">
                 <table class="w-full table-auto">
                     <thead>
@@ -125,7 +125,7 @@
                                 <td class="px-4 py-2 text-center"><input type="checkbox" bind:checked={user.canUpdate} on:change={() => updateUser(user)} class="form-checkbox text-gold-500"></td>
                                 <td class="px-4 py-2 text-center"><input type="checkbox" bind:checked={user.canDelete} on:change={() => updateUser(user)} class="form-checkbox text-gold-500"></td>
                                 <td class="px-4 py-2 text-center">
-                                    <button on:click={() => deleteUser(user.id)} class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition-colors">Delete</button>
+                                    <button on:click={() => deleteUser(user.id)} class="px-2 py-1 text-white transition-colors bg-red-500 rounded hover:bg-red-600">Delete</button>
                                 </td>
                             </tr>
                         {/each}

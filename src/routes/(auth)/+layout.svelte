@@ -3,7 +3,7 @@
     import { session } from '$lib/session';
     import { goto } from '$app/navigation';
     import { signOut } from 'firebase/auth';
-    import { auth } from '$lib/firebase.client';
+    import { getFirebase } from '$lib/firebase.client';
     import Nav from '../../components/Nav.svelte';
     import '../../app.css';
 
@@ -39,15 +39,20 @@
         }
     });
 
-    function logout() {
-        signOut(auth)
-            .then(() => {
-                goto('/login');
-                loggedIn = false;
-            })
-            .catch((error) => {
-                throw new Error(error);
-            });
+    async function logout() {
+        try {
+            const firebase = getFirebase();
+            if (!firebase) {
+                throw new Error("Firebase is not initialized");
+            }
+            const { auth } = firebase;
+            await signOut(auth);
+            goto('/login');
+            loggedIn = false;
+        } catch (error) {
+            console.error("Logout error:", error);
+            // Handle the error appropriately (e.g., show an error message to the user)
+        }
     }
 </script>
 

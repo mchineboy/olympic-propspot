@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { session } from '$lib/session';
-	import { auth, initializeFirebase } from '$lib/firebase.client';
+	import { getFirebase } from '$lib/firebase.client';
 	import {
 		GoogleAuthProvider,
 		signInWithPopup,
@@ -9,7 +9,7 @@
 		type User
 	} from 'firebase/auth';
 	import { goto } from '$app/navigation';
-	import { users } from '$lib/users';
+	import { users, type UserProfile } from '$lib/users';
 
 	let email: string = '';
 	let password: string = '';
@@ -28,8 +28,6 @@
 		loggedIn: boolean;
 		user: SessionUser;
 	}
-
-	initializeFirebase();
 
 	function createSessionUser(user: User): SessionUser {
 		return {
@@ -53,17 +51,23 @@
 		loading = true;
 		error = '';
 		try {
+			const firebase = getFirebase();
+			if (!firebase) {
+				throw new Error("Firebase is not initialized");
+			}
+			const { auth } = firebase;
 			const result: UserCredential = await signInWithEmailAndPassword(auth, email, password);
 			const sessionData: SessionData = {
 				loggedIn: true,
 				user: createSessionUser(result.user)
 			};
 
-			// From the user_profiles table in firebase, get their profile and add it to the sessionData
 			if (!sessionData.user.email) {
 				throw new Error('User email not found');
 			}
-			const userProfile = await users.getUserByEmail(sessionData.user.email);
+
+			const userProfile = await getUserProfile();
+
 			if (userProfile) {
 				sessionData.user = { ...sessionData.user, ...userProfile };
 				session.set(sessionData);
@@ -89,16 +93,30 @@
 		loading = true;
 		error = '';
 		try {
+			const firebase = getFirebase();
+			if (!firebase) {
+				throw new Error("Firebase is not initialized");
+			}
+			const { auth } = firebase;
 			const provider: GoogleAuthProvider = new GoogleAuthProvider();
 			const result: UserCredential = await signInWithPopup(auth, provider);
 			const sessionData: SessionData = {
 				loggedIn: true,
 				user: createSessionUser(result.user)
 			};
-			session.set(sessionData);
-			goto('/');
+
+			const userProfile = await getUserProfile();
+
+			if (userProfile) {
+				sessionData.user = { ...sessionData.user, ...userProfile };
+				session.set(sessionData);
+				goto('/dashboard');
+			} else {
+				// Handle case where user is not found
+				goto('/login');
+			}
 		} catch (e: unknown) {
-			console.trace(e);
+			console.error(e);
 
 			if (e instanceof Error) {
 				error = e.message;
@@ -108,6 +126,24 @@
 		} finally {
 			loading = false;
 		}
+	}
+
+	async function getUserProfile(): Promise<UserProfile> {
+		const firebase = getFirebase();
+		if (!firebase) {
+			throw new Error("Firebase is not initialized");
+		}
+		const { auth } = firebase;
+		const user = auth.currentUser;
+
+		if (!user || !user.email) {
+			throw new Error('User not found');
+		}
+		const userProfile = await users.getUserByEmail(user.email);
+		if (!userProfile) {
+			throw new Error('User profile not found');
+		}
+		return userProfile;
 	}
 </script>
 
@@ -209,12 +245,6 @@
 					</button>
 				</div>
 			</div>
-		</div>
-		<div class="text-center text-yellow-200">
-			New to the theater? <a
-				href="/register"
-				class="font-medium text-yellow-400 hover:text-yellow-300">Register here</a
-			>
 		</div>
 	</div>
 </div>

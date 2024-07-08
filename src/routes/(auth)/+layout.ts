@@ -1,18 +1,23 @@
-import { initializeFirebase, auth } from '$lib/firebase.client';
+import { getFirebase } from '$lib/firebase.client';
 import { browser } from '$app/environment';
-import { onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged, type User } from 'firebase/auth';
 
 export async function load({ url }) {
-    if (browser) {
-        try {
-            initializeFirebase();
-        } catch (ex) {
-            console.error(ex);
-        }
-    }
-
     function getAuthUser() {
-        return new Promise((resolve) => {
+        return new Promise<User | false>((resolve) => {
+            if (!browser) {
+                resolve(false);
+                return;
+            }
+
+            const firebase = getFirebase();
+            if (!firebase) {
+                console.error("Firebase is not initialized");
+                resolve(false);
+                return;
+            }
+
+            const { auth } = firebase;
             onAuthStateChanged(auth, (user) => resolve(user ? user : false));
         });
     }

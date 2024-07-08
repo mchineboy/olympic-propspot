@@ -16,7 +16,7 @@
 		<div class="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md text-center">
 			<div class="mb-8">
 				<div
-					class="w-32 h-32 p-2 mx-auto bg-purple-200 rounded-full flex items-center justify-center text-purple-600"
+					class="w-32 h-32 p-2 mx-auto bg-purple-800 rounded-full flex items-center justify-center text-purple-600"
 				>
                 <img class="w-auto h-fit" src="/images/olympic-propspot-high-resolution-logo-white-transparent.svg" alt="Logo">
 				</div>

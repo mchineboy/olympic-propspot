@@ -17,7 +17,7 @@
   <div class="px-2 mx-auto max-w-7xl sm:px-6 lg:px-8">
     <div class="relative flex items-center justify-between h-16">
       <div class="flex items-center flex-shrink-0">
-        <img class="w-auto h-8" src="/images/logo-no-background.svg" alt="Logo">
+        <img class="w-auto h-8" src="/images/olympic-propspot-high-resolution-logo-white-transparent.svg" alt="Logo">
       </div>
 
       <div class="flex-1"></div>

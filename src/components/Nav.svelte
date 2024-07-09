@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
-	import { session, type User } from '$lib/session';
+	import { session, type SessionData, type SessionUser, defaultSession } from '$lib/session';
 
 	export let loading: boolean;
 	export let loggedIn: boolean;
@@ -12,7 +12,8 @@
 		isMenuOpen = !isMenuOpen;
 	}
 
-	$: user = $session.user as User | null;
+	$: sessionData = $session || defaultSession;
+	$: user = sessionData.user;
 </script>
 
 <nav class="bg-purple-900 shadow-lg">
@@ -34,7 +35,7 @@
 			<div class="flex items-center">
 				{#if loading}
 					<div class="ml-3 text-yellow-300">Loading...</div>
-				{:else if loggedIn && $session.user}
+				{:else if loggedIn && user}
 					<button
 						class="p-2 text-yellow-300 rounded-full hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-purple-900 focus:ring-white"
 					>
@@ -62,15 +63,15 @@
 										alt={$session.user?.displayName || 'User avatar'}
 									/>
 								{:else}
-									<div class="flex items-center justify-center w-8 h-8 font-bold text-purple-900 bg-yellow-300 rounded-full">
-										{#if user?.displayName}
-											{user.displayName[0].toUpperCase()}
-										{:else if user?.email}
-											{user.email[0].toUpperCase()}
-										{:else}
-											U
-										{/if}
-									</div>
+                <div class="flex items-center justify-center w-8 h-8 font-bold text-purple-900 bg-yellow-300 rounded-full">
+                  {#if user.displayName}
+                    {user.displayName[0].toUpperCase()}
+                  {:else if user.email}
+                    {user.email[0].toUpperCase()}
+                  {:else}
+                    U
+                  {/if}
+                </div>
 								{/if}
 							</button>
 						</div>

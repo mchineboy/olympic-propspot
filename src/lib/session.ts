@@ -1,16 +1,20 @@
-import { writable, type Writable } from 'svelte/store';
+import { writable } from 'svelte/store';
 
-export type User = {
-	email?: string | null;
-	displayName?: string | null;
-	photoURL?: string | null;
-	uid?: string | null;
+export interface SessionUser {
+  displayName: string | null;
+  email: string | null;
+  photoURL: string | null;
+  uid: string;
+}
+
+export interface SessionData {
+  loggedIn: boolean;
+  user: SessionUser | null;
+}
+
+export const defaultSession: SessionData = {
+  loggedIn: false,
+  user: null
 };
 
-export type SessionState = {
-	user: User | null;
-	loading?: boolean;
-	loggedIn?: boolean;
-};
-
-export const session = <Writable<SessionState>>writable();
+export const session = writable<SessionData>(defaultSession);

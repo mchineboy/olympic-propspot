@@ -1,11 +1,14 @@
 <script lang="ts">
-    import '../app.css';
-    import Nav from '../components/Nav.svelte';
-    import type { LayoutData } from './$types';
-    
-    export let data: LayoutData;
+	import '../app.css';
+	import Nav from '../components/Nav.svelte';
+	import type { LayoutData } from './$types';
+    import { page } from '$app/stores';
+
+	export let data: LayoutData;
 </script>
 
-<Nav loading={false} loggedIn={false} logout={() => {}} />
+{#if !$page.url.pathname.startsWith('/dashboard')}
+	<Nav loading={false} loggedIn={false} logout={() => {}} />
+{/if}
 
 <slot />

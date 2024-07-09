@@ -142,6 +142,7 @@
 		}
 		const userProfile = await users.getUserByFirebaseId(user.uid);
 		if (!userProfile) {
+			console.trace(`User profile not found for ${user.email}: ${JSON.stringify(user, null, 2)}`)
 			throw new Error('User profile not found');
 		}
 		return userProfile;

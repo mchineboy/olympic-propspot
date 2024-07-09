@@ -62,9 +62,7 @@
 										alt={$session.user?.displayName || 'User avatar'}
 									/>
 								{:else}
-									<div
-										class="flex items-center justify-center w-8 h-8 font-bold text-purple-900 bg-yellow-300 rounded-full"
-									>
+									<div class="flex items-center justify-center w-8 h-8 font-bold text-purple-900 bg-yellow-300 rounded-full">
 										{#if user?.displayName}
 											{user.displayName[0].toUpperCase()}
 										{:else if user?.email}

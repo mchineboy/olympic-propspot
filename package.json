@@ -35,6 +35,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"firebase": "^10.12.3"
+		"firebase": "^10.12.3",
+		"svelte-infinite-scroll": "^2.0.1"
 	}
 }

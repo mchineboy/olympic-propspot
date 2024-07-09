@@ -6,6 +6,6 @@
     export let data: LayoutData;
 </script>
 
-<Nav loading={false} loggedIn={false} user={null} logout={() => {}} />
+<Nav loading={false} loggedIn={false} logout={() => {}} />
 
 <slot />

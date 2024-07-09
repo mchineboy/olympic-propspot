@@ -1,13 +1,9 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
+	import { session, type User } from '$lib/session';
 
 	export let loading: boolean;
 	export let loggedIn: boolean;
-	export let user: {
-		photoURL: string | null;
-		displayName: string | null;
-		email: string | null;
-	} | null;
 	export let logout: () => void;
 
 	let isMenuOpen: boolean = false;
@@ -15,6 +11,8 @@
 	function toggleMenu() {
 		isMenuOpen = !isMenuOpen;
 	}
+
+	$: user = $session.user as User | null;
 </script>
 
 <nav class="bg-purple-900 shadow-lg">
@@ -36,7 +34,7 @@
 			<div class="flex items-center">
 				{#if loading}
 					<div class="ml-3 text-yellow-300">Loading...</div>
-				{:else if loggedIn && user}
+				{:else if loggedIn && $session.user}
 					<button
 						class="p-2 text-yellow-300 rounded-full hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-purple-900 focus:ring-white"
 					>
@@ -57,21 +55,23 @@
 								class="flex text-sm bg-purple-800 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-purple-900 focus:ring-white"
 							>
 								<span class="sr-only">Open user menu</span>
-								{#if user.photoURL}
+								{#if $session.user}
 									<img
 										class="w-8 h-8 rounded-full"
-										src={user.photoURL}
-										alt={user.displayName || 'User avatar'}
+										src={$session.user?.photoURL}
+										alt={$session.user?.displayName || 'User avatar'}
 									/>
 								{:else}
 									<div
 										class="flex items-center justify-center w-8 h-8 font-bold text-purple-900 bg-yellow-300 rounded-full"
 									>
-										{user.displayName
-											? user.displayName[0].toUpperCase()
-											: user.email
-												? user.email[0].toUpperCase()
-												: 'U'}
+										{#if user?.displayName}
+											{user.displayName[0].toUpperCase()}
+										{:else if user?.email}
+											{user.email[0].toUpperCase()}
+										{:else}
+											U
+										{/if}
 									</div>
 								{/if}
 							</button>
@@ -87,12 +87,13 @@
 								<a href="/settings" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
 									>Settings</a
 								>
-								<button
-									on:click={logout}
-									class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100"
-									>Sign out</button
-								>
 							</div>
+							<button
+								on:click={logout}
+								class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100"
+							>
+								Sign out
+							</button>
 						{/if}
 					</div>
 

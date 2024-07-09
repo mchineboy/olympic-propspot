@@ -56,7 +56,7 @@
     }
 </script>
 
-<Nav {loading} {loggedIn} {user} {logout} />
+<Nav {loading} {loggedIn} {logout} />
 
 {#if loading}
     <div>Loading...</div>

@@ -1,5 +1,5 @@
 import { writable } from "svelte/store";
-import { onSnapshot, collection, query, where, getDocs, type DocumentData, type Timestamp } from "firebase/firestore";
+import { onSnapshot, collection, query, where, doc, getDoc, getDocs, type DocumentData, type Timestamp } from "firebase/firestore";
 import { firestore } from "./firebase";
 
 export interface UserProfile extends DocumentData {
@@ -31,15 +31,14 @@ function userStore() {
             return { ...userDoc.data(), id: userDoc.id } as UserProfile;
         },
         getUserByFirebaseId: async (firebaseId: string): Promise<UserProfile | null> => {
-            const q = query(collection(firestore, `profiles/${firebaseId}`));
-            const querySnapshot = await getDocs(q);
+            const docRef = doc(firestore, 'profiles', firebaseId);
+            const docSnap = await getDoc(docRef);
             
-            if (querySnapshot.empty) {
+            if (!docSnap.exists()) {
                 return null;
             }
-
-            const userDoc = querySnapshot.docs[0];
-            return { ...userDoc.data(), id: userDoc.id } as UserProfile
+        
+            return { ...docSnap.data(), id: docSnap.id } as UserProfile;
         },
         init: () => {
             onSnapshot(collection(firestore, "props"), (snapshot) => {

@@ -20,7 +20,7 @@ function userStore() {
     return {
         subscribe,
         getUserByEmail: async (email: string): Promise<UserProfile | null> => {
-            const q = query(collection(firestore, "props"), where("email", "==", email));
+            const q = query(collection(firestore, "profiles"), where("email", "==", email));
             const querySnapshot = await getDocs(q);
             
             if (querySnapshot.empty) {
@@ -29,6 +29,17 @@ function userStore() {
 
             const userDoc = querySnapshot.docs[0];
             return { ...userDoc.data(), id: userDoc.id } as UserProfile;
+        },
+        getUserByFirebaseId: async (firebaseId: string): Promise<UserProfile | null> => {
+            const q = query(collection(firestore, `profiles/${firebaseId}`));
+            const querySnapshot = await getDocs(q);
+            
+            if (querySnapshot.empty) {
+                return null;
+            }
+
+            const userDoc = querySnapshot.docs[0];
+            return { ...userDoc.data(), id: userDoc.id } as UserProfile
         },
         init: () => {
             onSnapshot(collection(firestore, "props"), (snapshot) => {

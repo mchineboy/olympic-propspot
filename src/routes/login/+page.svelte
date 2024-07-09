@@ -140,7 +140,7 @@
 		if (!user || !user.email) {
 			throw new Error('User not found');
 		}
-		const userProfile = await users.getUserByEmail(user.email);
+		const userProfile = await users.getUserByFirebaseId(user.uid);
 		if (!userProfile) {
 			throw new Error('User profile not found');
 		}

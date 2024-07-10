@@ -20,10 +20,13 @@ export interface PropAttribute {
   value: string;
 }
 
+export const categories = ['Clothing', 'Furniture', 'Accessories', 'Electronics', 'Wigs', 'Other'] as const;
+export type Category = typeof categories[number];
+
 export interface Prop extends DocumentData {
     id: string;
     name?: string;
-    category?: string;
+    category?: Category | undefined;
     type?: string;
     imageUrl?: string;
     lastUsed?: Timestamp;

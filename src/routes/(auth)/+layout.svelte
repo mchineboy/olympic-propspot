@@ -4,7 +4,7 @@
     import { goto } from '$app/navigation';
     import { signOut } from 'firebase/auth';
     import { getFirebase } from '$lib/firebase.client';
-    import Nav from '../../components/Nav.svelte';
+    import Nav from '$components/Nav.svelte';
     import '../../app.css';
 
     import type { LayoutData } from './$types';

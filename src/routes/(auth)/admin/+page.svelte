@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
     import { users as props, type UserProfile } from '$lib/users';
     import { addDoc, collection, updateDoc, doc, deleteDoc } from 'firebase/firestore';
     import { firestore } from '$lib/firebase';

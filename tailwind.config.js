@@ -17,6 +17,11 @@ export default {
           900: '#332400',
         },
       },
+      textStyles: {
+        oblique: {
+          fontStyle: 'oblique 10deg', // You can adjust the degree
+        },
+      },
     },
   },
   plugins: [],

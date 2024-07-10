@@ -41,7 +41,7 @@ function userStore() {
             return { ...docSnap.data(), id: docSnap.id } as UserProfile;
         },
         init: () => {
-            onSnapshot(collection(firestore, "props"), (snapshot) => {
+            onSnapshot(collection(firestore, "profiles"), (snapshot) => {
                 const props: UserProfile[] = [];
                 snapshot.forEach((post) => {
                     props.push({ ...post.data(), id: post.id } as UserProfile);

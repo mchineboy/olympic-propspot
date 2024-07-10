@@ -4,6 +4,7 @@
     import { goto } from '$app/navigation';
     import { signOut } from 'firebase/auth';
     import { getFirebase } from '$lib/firebase.client';
+    import { props } from '$lib/propsStore';
     import Nav from '$components/Nav.svelte';
     import '../../app.css';
 
@@ -34,7 +35,12 @@
             };
         });
 
-        if (!loggedIn) {
+        if (loggedIn) {
+            // Initialize props store if user is logged in
+            if (!props.isInitialized()) {
+                props.init();
+            }
+        } else {
             goto('/login');
         }
     });

@@ -1,5 +1,5 @@
 import { initializeApp, getApps, getApp, type FirebaseApp } from 'firebase/app';
-import { getAuth, connectAuthEmulator, type Auth } from 'firebase/auth';
+import { getAuth, connectAuthEmulator, onAuthStateChanged, type Auth, type User } from 'firebase/auth';
 import { getFirestore, type Firestore } from 'firebase/firestore';
 import { browser } from '$app/environment';
 
@@ -47,4 +47,18 @@ export function getFirebase() {
     throw new Error("Can't use the Firebase client on the server.");
   }
   return initializeFirebase();
+}
+
+export function waitForAuth(): Promise<User | null> {
+  const firebase = getFirebase();
+  if (!firebase) {
+    return Promise.resolve(null);
+  }
+
+  return new Promise((resolve) => {
+    const unsubscribe = onAuthStateChanged(firebase.auth, (user) => {
+      unsubscribe();
+      resolve(user);
+    });
+  });
 }

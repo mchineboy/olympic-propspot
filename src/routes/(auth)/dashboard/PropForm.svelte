@@ -103,7 +103,7 @@
 		error = null;
 		isLoading = true;
 		try {
-			let imageUrl = editingProp.imageUrl;
+			let imageUrl: string | undefined | null = editingProp.imageUrl;
 
 			if (imageFile) {
 				imageUrl = await uploadImage();

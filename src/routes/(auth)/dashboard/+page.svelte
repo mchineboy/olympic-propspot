@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import { props } from '$lib/propsStore';
   import type { Prop } from '$lib/propsStore';
   import PropList from './PropList.svelte';
@@ -46,12 +45,6 @@
     isAddDialogOpen = false;
     editingProp = null;
   }
-
-  onMount(() => {
-    if (!props.isInitialized()) {
-      props.init();
-    }
-  });
 </script>
 
 <main class="container px-4 py-8 mx-auto">

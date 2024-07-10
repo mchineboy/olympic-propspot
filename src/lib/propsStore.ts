@@ -13,7 +13,7 @@ import {
   type DocumentData, 
   type Timestamp 
 } from "firebase/firestore";
-import { firestore } from "./firebase";
+import { getFirebase } from "./firebase.client";
 
 export interface PropAttribute {
   name: string;
@@ -52,8 +52,10 @@ function propsStore() {
         
         // Create
         addProp: async (prop: Omit<Prop, 'id'>) => {
+            const firebase = getFirebase();
+            if (!firebase) throw new Error("Firebase is not initialized");
             try {
-                const docRef = await addDoc(collection(firestore, "props"), prop);
+                const docRef = await addDoc(collection(firebase.db, "props"), prop);
                 return docRef.id;
             } catch (error) {
                 console.error("Error adding prop: ", error);
@@ -63,7 +65,9 @@ function propsStore() {
 
         // Read (single prop)
         getProp: async (id: string) => {
-            const docRef = doc(firestore, "props", id);
+            const firebase = getFirebase();
+            if (!firebase) throw new Error("Firebase is not initialized");
+            const docRef = doc(firebase.db, "props", id);
             const docSnap = await getDoc(docRef);
             if (docSnap.exists()) {
                 return { id: docSnap.id, ...docSnap.data() } as Prop;
@@ -74,8 +78,10 @@ function propsStore() {
 
         // Update
         updateProp: async (id: string, prop: Partial<Prop>) => {
+            const firebase = getFirebase();
+            if (!firebase) throw new Error("Firebase is not initialized");
             try {
-                const docRef = doc(firestore, "props", id);
+                const docRef = doc(firebase.db, "props", id);
                 await updateDoc(docRef, prop);
             } catch (error) {
                 console.error("Error updating prop: ", error);
@@ -85,8 +91,10 @@ function propsStore() {
 
         // Delete
         deleteProp: async (id: string) => {
+            const firebase = getFirebase();
+            if (!firebase) throw new Error("Firebase is not initialized");
             try {
-                const docRef = doc(firestore, "props", id);
+                const docRef = doc(firebase.db, "props", id);
                 await deleteDoc(docRef);
             } catch (error) {
                 console.error("Error deleting prop: ", error);
@@ -96,9 +104,11 @@ function propsStore() {
 
         // Search function
         searchProps: async (searchTerms: string) => {
+            const firebase = getFirebase();
+            if (!firebase) throw new Error("Firebase is not initialized");
             const terms = searchTerms.toLowerCase().split(' ');
             
-            let q = query(collection(firestore, "props"));
+            let q = query(collection(firebase.db, "props"));
             
             // Add specific queries for hair-related terms
             if (terms.includes('blonde')) {
@@ -132,7 +142,9 @@ function propsStore() {
                 console.warn('Store is already initialized. Call stop() before reinitializing.');
                 return;
             }
-            unsubscribe = onSnapshot(collection(firestore, "props"), (snapshot) => {
+            const firebase = getFirebase();
+            if (!firebase) throw new Error("Firebase is not initialized");
+            unsubscribe = onSnapshot(collection(firebase.db, "props"), (snapshot) => {
                 const props: Prop[] = [];
                 snapshot.forEach((doc) => {
                     props.push({ ...doc.data(), id: doc.id } as Prop);
@@ -158,5 +170,5 @@ function propsStore() {
 
 export const props = propsStore();
 
-// Initialize the store
-props.init();
+// Remove automatic initialization
+// props.init();

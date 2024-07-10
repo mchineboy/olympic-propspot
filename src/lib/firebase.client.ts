@@ -44,9 +44,12 @@ function initializeFirebase() {
 
 export function getFirebase() {
   if (!browser) {
-    throw new Error("Can't use the Firebase client on the server.");
+    console.log("Can't use Firebase on the server.");
+    return null;
   }
-  return initializeFirebase();
+  const instance = initializeFirebase();
+  console.log("Firebase initialized:", instance ? "success" : "failed");
+  return instance;
 }
 
 export function waitForAuth(): Promise<User | null> {

@@ -22,9 +22,13 @@
 	});
 
 	onMount(async () => {
+		console.log('Layout mounted');
 		const user: any = await data.getAuthUser();
+		console.log('Auth user:', user);
 
 		const loggedIn = !!user && user?.emailVerified;
+		console.log('User logged in:', loggedIn);
+
 		session.update((cur: any) => {
 			loading = false;
 			return {
@@ -36,12 +40,21 @@
 		});
 
 		if (loggedIn) {
-			// Initialize props store if user is logged in
-			if (!props.isInitialized()) {
-				console.log('Initializing props store');
-				props.init();
+			console.log('Attempting to initialize Firebase');
+			const firebase = getFirebase();
+			if (firebase) {
+				console.log('Firebase initialized successfully');
+				if (!props.isInitialized()) {
+					console.log('Initializing props store');
+					props.init();
+				} else {
+					console.log('Props store already initialized');
+				}
+			} else {
+				console.error('Failed to initialize Firebase');
 			}
 		} else {
+			console.log('User not logged in, redirecting to login');
 			goto('/login');
 		}
 	});

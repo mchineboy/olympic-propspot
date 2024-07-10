@@ -21,23 +21,23 @@ export interface PropAttribute {
 }
 
 export interface Prop extends DocumentData {
-  id: string;
-  name?: string;
-  category?: string;
-  imageUrl?: string;
-  lastUsed?: Timestamp;
-  location?: string;
-  color?: string;
-  size?: string;
-  material?: string;
-  type?: string;
-  hairColor?: string;
-  hairLength?: string;
-  hairStyle?: string;
-  attributes?: PropAttribute[];
-  notes?: string;
-  tags?: string[];
-}
+    id: string;
+    name?: string;
+    category?: string;
+    type?: string;
+    imageUrl?: string;
+    lastUsed?: Timestamp;
+    location?: string;
+    color?: string;
+    size?: string;
+    material?: string;
+    hairColor?: string;
+    hairLength?: string;
+    hairStyle?: string;
+    attributes?: PropAttribute[];
+    notes?: string;
+    tags?: string[];
+  }
 
 function propsStore() {
     const { subscribe, set } = writable<Prop[]>([]);

@@ -53,7 +53,7 @@
     function handleCategoryChange() {
       if (editingProp.category && editingProp.category in types) {
         const categoryTypes = types[editingProp.category as Category];
-        if (!categoryTypes.includes(editingProp.type)) {
+        if (editingProp.type && !categoryTypes.includes(editingProp.type)) {
           editingProp.type = categoryTypes[0];
         }
       } else {
@@ -106,7 +106,7 @@
       error = null;
       isLoading = true;
       try {
-        let imageUrl = editingProp.imageUrl;
+        let imageUrl: string | undefined | null = editingProp.imageUrl;
   
         if (imageFile) {
           imageUrl = await uploadImage();

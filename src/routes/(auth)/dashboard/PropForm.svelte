@@ -62,13 +62,16 @@
     }
   }
 
+  
+  let useCamera = false;
+
   async function handleImageUpload(event: Event) {
     error = null;
     const target = event.target as HTMLInputElement;
     if (target.files && target.files[0]) {
       const file = target.files[0];
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
-        error = "File size exceeds 5MB limit.";
+      if (file.size > 10 * 1024 * 1024) { // 5MB limit
+        error = "File size exceeds 10MB limit.";
         return;
       }
       imageFile = file;
@@ -137,6 +140,10 @@
 
   function cancel() {
     dispatch('cancel');
+  }
+
+  function toggleCamera() {
+    useCamera = !useCamera;
   }
 
   function handleTagsInput(event: Event) {
@@ -248,14 +255,23 @@
 
   <div>
     <label for="prop-image" class="block text-sm font-medium text-purple-700">Upload Photo or Take Picture</label>
-    <input 
-      type="file" 
-      id="prop-image" 
-      accept="image/*" 
-      capture="environment"
-      on:change={handleImageUpload}
-      class="block w-full mt-1 text-sm text-purple-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
-    >
+    <div class="flex items-center space-x-2">
+      <input 
+        type="file" 
+        id="prop-image" 
+        accept="image/*" 
+        capture={useCamera ? 'environment' : undefined}
+        on:change={handleImageUpload}
+        class="block w-full mt-1 text-sm text-purple-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
+      >
+      <button 
+        type="button" 
+        on:click={toggleCamera} 
+        class="px-3 py-2 text-sm font-medium text-purple-700 bg-purple-100 rounded-md"
+      >
+        {useCamera ? 'Use File Upload' : 'Use Camera'}
+      </button>
+    </div>
   </div>
 
   {#if editingProp.imagePreviewUrl || editingProp.imageUrl}

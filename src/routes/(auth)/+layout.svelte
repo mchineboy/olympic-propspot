@@ -64,7 +64,7 @@
     <div>Redirecting to login...</div>
 {:else}
     <div>
-        <h1 class="">Welcome, {user.displayName}</h1>
+        <h1 class="text-xs text-right">Welcome, {user.displayName}</h1>
         <slot />
     </div>
 {/if}

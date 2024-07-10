@@ -15,12 +15,14 @@
     function loadMoreProps() {
       const newProps = props.slice(page * pageSize, (page + 1) * pageSize);
       displayedProps = [...displayedProps, ...newProps];
-      page++;
+      page++;   
+      console.log('Displayed props after loading more:', displayedProps); // Add this line
     }
   
     $: {
       page = 0;
-      displayedProps = [];
+      displayedProps = [];    
+      console.log('PropList received props:', props); // Add this line
       loadMoreProps();
     }
   </script>

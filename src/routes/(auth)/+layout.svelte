@@ -1,76 +1,77 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
-    import { session } from '$lib/session';
-    import { goto } from '$app/navigation';
-    import { signOut } from 'firebase/auth';
-    import { getFirebase } from '$lib/firebase.client';
-    import { props } from '$lib/propsStore';
-    import Nav from '$components/Nav.svelte';
-    import '../../app.css';
+	import { onMount } from 'svelte';
+	import { session } from '$lib/session';
+	import { goto } from '$app/navigation';
+	import { signOut } from 'firebase/auth';
+	import { getFirebase } from '$lib/firebase.client';
+	import { props } from '$lib/propsStore';
+	import Nav from '$components/Nav.svelte';
+	import '../../app.css';
 
-    import type { LayoutData } from './$types';
-    export let data: LayoutData;
+	import type { LayoutData } from './$types';
+	export let data: LayoutData;
 
-    let loading: boolean = true;
-    let loggedIn: boolean = false;
-    let user: any = null;
+	let loading: boolean = true;
+	let loggedIn: boolean = false;
+	let user: any = null;
 
-    session.subscribe((cur: any) => {
-        loading = cur?.loading;
-        loggedIn = cur?.loggedIn;
-        user = cur?.user;
-    });
+	session.subscribe((cur: any) => {
+		loading = cur?.loading;
+		loggedIn = cur?.loggedIn;
+		user = cur?.user;
+	});
 
-    onMount(async () => {
-        const user: any = await data.getAuthUser();
+	onMount(async () => {
+		const user: any = await data.getAuthUser();
 
-        const loggedIn = !!user && user?.emailVerified;
-        session.update((cur: any) => {
-            loading = false;
-            return {
-                ...cur,
-                user,
-                loggedIn,
-                loading: false
-            };
-        });
+		const loggedIn = !!user && user?.emailVerified;
+		session.update((cur: any) => {
+			loading = false;
+			return {
+				...cur,
+				user,
+				loggedIn,
+				loading: false
+			};
+		});
 
-        if (loggedIn) {
-            // Initialize props store if user is logged in
-            if (!props.isInitialized()) {
-                props.init();
-            }
-        } else {
-            goto('/login');
-        }
-    });
+		if (loggedIn) {
+			// Initialize props store if user is logged in
+			if (!props.isInitialized()) {
+				console.log('Initializing props store');
+				props.init();
+			}
+		} else {
+			goto('/login');
+		}
+	});
 
-    async function logout() {
-        try {
-            const firebase = getFirebase();
-            if (!firebase) {
-                throw new Error("Firebase is not initialized");
-            }
-            const { auth } = firebase;
-            await signOut(auth);
-            goto('/login');
-            loggedIn = false;
-        } catch (error) {
-            console.error("Logout error:", error);
-            // Handle the error appropriately (e.g., show an error message to the user)
-        }
-    }
+	async function logout() {
+		try {
+			const firebase = getFirebase();
+			if (!firebase) {
+				throw new Error('Firebase is not initialized');
+			}
+			const { auth } = firebase;
+			await signOut(auth);
+			goto('/login');
+			loggedIn = false;
+		} catch (error) {
+			console.error('Logout error:', error);
+			// Handle the error appropriately (e.g., show an error message to the user)
+		}
+	}
 </script>
 
 <Nav {loading} {loggedIn} {logout} />
 
 {#if loading}
-    <div>Loading...</div>
+	<div>Loading...</div>
 {:else if !loggedIn}
-    <div>Redirecting to login...</div>
+	<div>Redirecting to login...</div>
 {:else}
-    <div>
-        <h1 class="px-8 font-sans text-xs italic text-right">Welcome, {user.displayName}</h1>
-        <slot />
-    </div>
+	<div>
+		<h1 class="px-8 font-sans text-xs italic text-right">Welcome, {user.displayName}</h1>
+		<slot />
+	</div>
 {/if}

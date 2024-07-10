@@ -149,6 +149,7 @@ function propsStore() {
                 snapshot.forEach((doc) => {
                     props.push({ ...doc.data(), id: doc.id } as Prop);
                 });
+                console.log('Fetched props:', props); // Add this line
                 set(props);
             });
         },

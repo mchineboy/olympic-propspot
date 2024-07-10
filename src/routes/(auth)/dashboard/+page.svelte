@@ -3,6 +3,7 @@
   import type { Prop } from '$lib/propsStore';
   import PropList from './PropList.svelte';
   import PropForm from './PropForm.svelte';
+  import { onMount } from 'svelte';
 
   let allProps: Prop[] = [];
   let sortOption = 'lastUsed-desc';
@@ -11,8 +12,13 @@
 
   $: {
     allProps = $props;
+    console.log('Updated allProps:', allProps); // Add this line
     sortProps();
   }
+
+  onMount(() => {
+    console.log('Component mounted');
+  });
 
   function sortProps() {
     switch (sortOption) {

@@ -10,6 +10,8 @@
     function editProp() {
       dispatch('edit', prop);
     }
+    
+    console.log('PropCard received prop:', prop); // Add this line
   
     async function deleteProp() {
       if (confirm('Are you sure you want to delete this prop?')) {

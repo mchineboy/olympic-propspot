@@ -15,8 +15,10 @@
     });
 </script>
 
-{#if !$page.url.pathname.startsWith('/dashboard')}
-	<Nav loading={loading} loggedIn={loggedIn} logout={() => {}} />
+{#if !$page.url.pathname.startsWith('/dashboard') && !$page.url.pathname.startsWith('/admin')}
+    {#if $page.url.pathname !== '/login' && $page.url.pathname !== '/register'}
+        <Nav loading={loading} loggedIn={loggedIn} logout={() => {}} />
+    {/if}
 {/if}
 
 <slot />

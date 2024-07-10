@@ -1,6 +1,8 @@
 import { writable } from 'svelte/store';
 
-export interface SessionUser {
+import { type UserProfile } from '$lib/users';
+
+export interface FirebaseUser {
   displayName: string | null;
   email: string | null;
   photoURL: string | null;
@@ -9,12 +11,21 @@ export interface SessionUser {
 
 export interface SessionData {
   loggedIn: boolean;
-  user: SessionUser | null;
+  user: UserProfile | null;
+  loading: boolean;
 }
 
 export const defaultSession: SessionData = {
   loggedIn: false,
-  user: null
+  user: null,
+  loading: true
 };
 
 export const session = writable<SessionData>(defaultSession);
+
+export function updateSession(data: Partial<SessionData>) {
+  session.update(currentSession => ({
+    ...currentSession,
+    ...data
+  }));
+}

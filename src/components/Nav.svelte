@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
-	import { session, type SessionData, type SessionUser, defaultSession } from '$lib/session';
+	import { session, defaultSession } from '$lib/session';
 
 	export let loading: boolean;
 	export let loggedIn: boolean;

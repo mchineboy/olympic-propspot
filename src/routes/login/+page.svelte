@@ -1,16 +1,6 @@
 <script lang="ts">
-	import { session, type SessionData } from '$lib/session';
-	import { getFirebase } from '$lib/firebase.client';
-	import {
-		GoogleAuthProvider,
-		signInWithPopup,
-		signInWithEmailAndPassword,
-		type UserCredential,
-		type User
-	} from 'firebase/auth';
+	import { loginWithEmailAndPassword, loginWithGoogle } from '$lib/auth.service';
 	import { goto } from '$app/navigation';
-	import { users, type UserProfile } from '$lib/users';
-	import { doc, setDoc, getDoc } from 'firebase/firestore';
 
 	let email: string = '';
 	let password: string = '';
@@ -18,22 +8,12 @@
 	let error: string = '';
 	let rememberMe: boolean = false;
 
-	function createSessionUser(user: User, profile: UserProfile): UserProfile {
-		return {
-			...profile, // This spreads all properties from the profile
-			displayName: user.displayName || profile.name,
-			email: user.email || profile.email,
-			photoURL: user.photoURL || undefined,
-			uid: user.uid
-		};
-	}
-
 	function validateEmail(email: string): boolean {
 		const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 		return re.test(email);
 	}
 
-	async function loginWithMail(): Promise<void> {
+	async function handleEmailLogin(): Promise<void> {
 		if (!validateEmail(email)) {
 			error = 'Please enter a valid email address';
 			return;
@@ -41,31 +21,11 @@
 		loading = true;
 		error = '';
 		try {
-			const firebase = getFirebase();
-			if (!firebase) {
-				throw new Error('Firebase is not initialized');
+			await loginWithEmailAndPassword(email, password);
+			if (rememberMe) {
+				// Implement remember me functionality
 			}
-			const { auth } = firebase;
-			const result: UserCredential = await signInWithEmailAndPassword(auth, email, password);
-
-			const userProfile = await getUserProfile(result.user.uid);
-
-			if (userProfile) {
-				const sessionData: SessionData = {
-					loggedIn: true,
-					user: createSessionUser(result.user, userProfile),
-					loading: false
-				};
-				// In both loginWithMail and loginWithGoogle:
-				session.set(sessionData);
-				console.log('Session set:', JSON.stringify(sessionData, null, 2));
-				if (rememberMe) {
-					// Implement remember me functionality
-				}
-				goto('/dashboard');
-			} else {
-				error = 'User profile not found';
-			}
+			goto('/dashboard');
 		} catch (e: unknown) {
 			if (e instanceof Error) {
 				error = e.message;
@@ -77,46 +37,12 @@
 		}
 	}
 
-	async function loginWithGoogle(): Promise<void> {
+	async function handleGoogleLogin(): Promise<void> {
 		loading = true;
 		error = '';
 		try {
-			const firebase = getFirebase();
-			if (!firebase) {
-				throw new Error('Firebase is not initialized');
-			}
-			const { auth, db } = firebase;
-			const provider: GoogleAuthProvider = new GoogleAuthProvider();
-			const result: UserCredential = await signInWithPopup(auth, provider);
-
-			const userProfile = await getUserProfile(result.user.uid);
-
-			if (userProfile) {
-				const sessionData: SessionData = {
-					loggedIn: true,
-					user: createSessionUser(result.user, userProfile),
-					loading: false
-				};
-				// In both loginWithMail and loginWithGoogle:
-				session.set(sessionData);
-				console.log('Session set:', JSON.stringify(sessionData, null, 2));
-				goto('/dashboard');
-			} else {
-				// User is not registered, add to purgatory
-				await setDoc(doc(db, 'purgatory', result.user.uid), {
-					name: result.user.displayName,
-					email: result.user.email,
-					registeredAt: new Date(),
-					status: 'pending'
-				});
-
-				// Sign out the user
-				await auth.signOut();
-
-				// Show notification
-				error =
-					'Your account is pending approval. Please wait for an administrator to approve your account.';
-			}
+			await loginWithGoogle();
+			goto('/dashboard');
 		} catch (e: unknown) {
 			console.trace(e);
 			if (e instanceof Error) {
@@ -126,21 +52,6 @@
 			}
 		} finally {
 			loading = false;
-		}
-	}
-
-	async function getUserProfile(uid: string): Promise<UserProfile | null> {
-		try {
-			const userProfile = await users.getUserByFirebaseId(uid);
-			if (!userProfile) {
-				console.warn(`User profile not found for UID: ${uid}`);
-				return null;
-			}
-			console.log('Full User profile found:', JSON.stringify(userProfile, null, 2));
-			return userProfile;
-		} catch (error) {
-			console.error('Error fetching user profile:', error);
-			return null;
 		}
 	}
 </script>
@@ -159,7 +70,7 @@
 					{error}
 				</div>
 			{/if}
-			<form on:submit|preventDefault={loginWithMail} class="space-y-6">
+			<form on:submit|preventDefault={handleEmailLogin} class="space-y-6">
 				<div>
 					<label for="email" class="sr-only">Email</label>
 					<input
@@ -227,7 +138,7 @@
 				</div>
 				<div class="mt-6">
 					<button
-						on:click={loginWithGoogle}
+						on:click={handleGoogleLogin}
 						class="w-full px-4 py-2 text-sm font-medium text-yellow-400 transition duration-150 ease-in-out bg-transparent border border-yellow-500 rounded-md shadow-sm hover:bg-yellow-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"
 						disabled={loading}
 					>

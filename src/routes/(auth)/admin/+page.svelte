@@ -1,16 +1,17 @@
 <script lang="ts">
-	import { session, type SessionData } from '$lib/session';
-	import { type UserProfile } from '$lib/users';
-	import { users as props } from '$lib/users';
+	import { session } from '$lib/session';
+	import { isAdmin } from '$lib/auth.service';
+	import { users } from '$lib/users';
+	import type { UserProfile } from '$lib/users';
 	import { addDoc, collection, updateDoc, doc, deleteDoc } from 'firebase/firestore';
 	import { firestore } from '$lib/firebase';
 
-	$: currentUser = $session.user as UserProfile | null;
-	$: isAdmin = currentUser?.administrator ?? false;
+	$: currentUser = $session.user;
+	$: isAdminUser = isAdmin(currentUser);
 
-	let users: UserProfile[] = [];
+	let allUsers: UserProfile[] = [];
 
-	let newUser: Omit<UserProfile, 'id' | 'created' | 'displayName' | 'photoURL' | 'uid'> = {
+	let newUser: Omit<UserProfile, 'uid' | 'created' | 'displayName' | 'photoURL'> = {
 		name: '',
 		email: '',
 		administrator: false,
@@ -20,7 +21,7 @@
 		canDelete: false
 	};
 
-	$: users = $props;
+	$: allUsers = $users;
 
 	async function inviteUser() {
 		try {
@@ -46,14 +47,14 @@
 
 	async function updateUser(user: UserProfile) {
 		try {
-			await updateDoc(doc(firestore, 'users', user.id), {
+			await updateDoc(doc(firestore, 'users', user.uid), {
 				administrator: user.administrator,
 				canCreate: user.canCreate,
 				canRead: user.canRead,
 				canUpdate: user.canUpdate,
 				canDelete: user.canDelete
 			});
-			console.log('User updated:', user.id);
+			console.log('User updated:', user.uid);
 		} catch (error) {
 			console.error('Error updating user: ', error);
 		}
@@ -67,10 +68,9 @@
 			console.error('Error deleting user: ', error);
 		}
 	}
-	console.log('Current user:', currentUser);
 </script>
 
-{#if isAdmin}
+{#if isAdminUser}
 	<div class="container px-4 py-8 mx-auto">
 		<h1 class="mb-8 text-4xl font-bold text-purple-800">User Management</h1>
 
@@ -158,7 +158,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						{#each users as user}
+						{#each allUsers as user}
 							<tr class="border-b border-purple-100">
 								<td class="px-4 py-2">{user.name}</td>
 								<td class="px-4 py-2">{user.email}</td>
@@ -204,7 +204,7 @@
 								>
 								<td class="px-4 py-2 text-center">
 									<button
-										on:click={() => deleteUser(user.id)}
+										on:click={() => deleteUser(user.uid)}
 										class="px-2 py-1 text-white transition-colors bg-red-500 rounded hover:bg-red-600"
 										>Delete</button
 									>

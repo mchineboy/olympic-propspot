@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { session, type SessionData } from '$lib/session';
+	import { session, type SessionData, type FirebaseUser as SessionUser } from '$lib/session';
 	import { getFirebase } from '$lib/firebase.client';
 	import {
 		GoogleAuthProvider,
@@ -18,13 +18,13 @@
 	let error: string = '';
 	let rememberMe: boolean = false;
 
-	function createSessionUser(user: User, profile: UserProfile): UserProfile {
+	function createSessionUser(user: User, profile: UserProfile): SessionUser {
 		return {
 			displayName: user.displayName,
-			email: user.email!,
+			email: user.email,
 			photoURL: user.photoURL,
 			uid: user.uid,
-			administrator: profile.administrator || false
+			administrator: profile.administrator || false,
 		};
 	}
 
@@ -43,12 +43,12 @@
 		try {
 			const firebase = getFirebase();
 			if (!firebase) {
-				throw new Error('Firebase is not initialized');
+				throw new Error("Firebase is not initialized");
 			}
 			const { auth } = firebase;
 			const result: UserCredential = await signInWithEmailAndPassword(auth, email, password);
-
-			const userProfile = await getUserProfile();
+			
+			const userProfile = await getUserProfile(result.user.uid);
 
 			if (userProfile) {
 				const sessionData: SessionData = {
@@ -62,7 +62,6 @@
 				}
 				goto('/dashboard');
 			} else {
-				// Handle case where user is not found
 				error = 'User profile not found';
 			}
 		} catch (e: unknown) {
@@ -77,74 +76,67 @@
 	}
 
 	async function loginWithGoogle(): Promise<void> {
-    loading = true;
-    error = '';
-    try {
-        const firebase = getFirebase();
-        if (!firebase) {
-            throw new Error("Firebase is not initialized");
-        }
-        const { auth, db } = firebase;
-        const provider: GoogleAuthProvider = new GoogleAuthProvider();
-        const result: UserCredential = await signInWithPopup(auth, provider);
-        
-        // Check if user already exists in profiles collection
-        const userProfileDoc = await getDoc(doc(db, 'profiles', result.user.uid));
-        
-        if (userProfileDoc.exists()) {
-            // User is already registered and approved
-            const userProfile = userProfileDoc.data() as UserProfile;
-            const sessionData: SessionData = {
-                loggedIn: true,
-                user: createSessionUser(result.user, userProfile),
-                loading: false
-            };
-            session.set(sessionData);
-            goto('/dashboard');
-        } else {
-            // User is not registered, add to purgatory
-            await setDoc(doc(db, 'purgatory', result.user.uid), {
-                name: result.user.displayName,
-                email: result.user.email,
-                registeredAt: new Date(),
-                status: 'pending'
-            });
-            
-            // Sign out the user
-            await auth.signOut();
-            
-            // Show notification
-            error = 'Your account is pending approval. Please wait for an administrator to approve your account.';
-        }
-    } catch (e: unknown) {
-        console.trace(e);
-        if (e instanceof Error) {
-            error = e.message;
-        } else {
-            error = 'An unknown error occurred';
-        }
-    } finally {
-        loading = false;
-    }
-}
+		loading = true;
+		error = '';
+		try {
+			const firebase = getFirebase();
+			if (!firebase) {
+				throw new Error("Firebase is not initialized");
+			}
+			const { auth, db } = firebase;
+			const provider: GoogleAuthProvider = new GoogleAuthProvider();
+			const result: UserCredential = await signInWithPopup(auth, provider);
+			
+			const userProfile = await getUserProfile(result.user.uid);
+			
+			if (userProfile) {
+				const sessionData: SessionData = {
+					loggedIn: true,
+					user: createSessionUser(result.user, userProfile),
+					loading: false
+				};
+				session.set(sessionData);
+				goto('/dashboard');
+			} else {
+				// User is not registered, add to purgatory
+				await setDoc(doc(db, 'purgatory', result.user.uid), {
+					name: result.user.displayName,
+					email: result.user.email,
+					registeredAt: new Date(),
+					status: 'pending'
+				});
+				
+				// Sign out the user
+				await auth.signOut();
+				
+				// Show notification
+				error = 'Your account is pending approval. Please wait for an administrator to approve your account.';
+			}
+		} catch (e: unknown) {
+			console.trace(e);
+			if (e instanceof Error) {
+				error = e.message;
+			} else {
+				error = 'An unknown error occurred';
+			}
+		} finally {
+			loading = false;
+		}
+	}
 
-	async function getUserProfile(): Promise<UserProfile> {
-		const firebase = getFirebase();
-		if (!firebase) {
-			throw new Error('Firebase is not initialized');
+	async function getUserProfile(uid: string): Promise<UserProfile | null> {
+		try {
+			const userProfile = await users.getUserByFirebaseId(uid);
+			if (!userProfile) {
+				console.warn(`User profile not found for UID: ${uid}`);
+				return null;
+			}
+			console.log('User profile found:', userProfile);
+			return userProfile;
+		} catch (error) {
+			console.error('Error fetching user profile:', error);
+			return null;
 		}
-		const { auth } = firebase;
-		const user = auth.currentUser;
-
-		if (!user || !user.email) {
-			throw new Error('User not found');
-		}
-		const userProfile = await users.getUserByFirebaseId(user.uid);
-		if (!userProfile) {
-			console.trace(`User profile not found for ${user.email}: ${JSON.stringify(user, null, 2)}`);
-			throw new Error('User profile not found');
-		}
-		return userProfile;
 	}
 </script>
 

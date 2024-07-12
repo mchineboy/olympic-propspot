@@ -4,6 +4,7 @@
   import PropList from './PropList.svelte';
   import PropForm from './PropForm.svelte';
   import { onMount } from 'svelte';
+  import { session } from '$lib/session';
 
   let allProps: Prop[] = [];
   let sortOption = 'lastUsed-desc';
@@ -65,6 +66,8 @@
     isAddDialogOpen = false;
     editingProp = null;
   }
+
+  $: userPermissions = $session.user;
 </script>
 
 <main class="container px-4 py-8 mx-auto">
@@ -91,14 +94,21 @@
       class="bg-purple-100 border border-purple-300 text-purple-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 p-2.5"
     />
     
-    <button on:click={openAddDialog} class="px-4 py-2 font-bold text-white bg-purple-600 rounded hover:bg-purple-700">
-      Add New Prop
-    </button>
+    {#if userPermissions?.canCreate}
+      <button on:click={openAddDialog} class="px-4 py-2 font-bold text-white bg-purple-600 rounded hover:bg-purple-700">
+        Add New Prop
+      </button>
+    {/if}
   </div>
 
-  <PropList props={filteredProps} on:edit={openEditDialog} />
+  <PropList 
+    props={filteredProps} 
+    on:edit={openEditDialog}
+    canUpdate={userPermissions?.canUpdate}
+    canDelete={userPermissions?.canDelete}
+  />
 
-  {#if isAddDialogOpen}
+  {#if isAddDialogOpen && (userPermissions?.canCreate || (editingProp && userPermissions?.canUpdate))}
     <div class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-gray-600 bg-opacity-50">
       <div class="relative w-full max-w-md p-4 mx-4 my-8 bg-white rounded-lg shadow-xl sm:p-6 md:p-8">
         <button 
@@ -111,7 +121,13 @@
           </svg>
         </button>
         <div class="max-h-[80vh] overflow-y-auto pb-4">
-          <PropForm prop={editingProp} on:save={closeDialog} on:cancel={closeDialog} />
+          <PropForm 
+            prop={editingProp} 
+            on:save={closeDialog} 
+            on:cancel={closeDialog}
+            canCreate={userPermissions?.canCreate}
+            canUpdate={userPermissions?.canUpdate}
+          />
         </div>
       </div>
     </div>

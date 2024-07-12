@@ -3,46 +3,20 @@
 	import { isAdmin } from '$lib/auth.service';
 	import { users } from '$lib/users';
 	import type { UserProfile } from '$lib/users';
-	import { addDoc, collection, updateDoc, doc, deleteDoc } from 'firebase/firestore';
+	import { updateDoc, doc, deleteDoc, getDocs, setDoc, collection } from 'firebase/firestore';
 	import { firestore } from '$lib/firebase';
 
 	$: currentUser = $session.user;
 	$: isAdminUser = isAdmin(currentUser);
 
 	let allUsers: UserProfile[] = [];
-
-	let newUser: Omit<UserProfile, 'uid' | 'created' | 'displayName' | 'photoURL'> = {
-		name: '',
-		email: '',
-		administrator: false,
-		canCreate: false,
-		canRead: false,
-		canUpdate: false,
-		canDelete: false
-	};
+	let purgatoryUsers: any[] = [];
 
 	$: allUsers = $users;
 
-	async function inviteUser() {
-		try {
-			const userRef = await addDoc(collection(firestore, 'users'), {
-				...newUser,
-				created: new Date()
-			});
-			console.log('User invited with ID:', userRef.id);
-			// Reset form after invitation
-			newUser = {
-				name: '',
-				email: '',
-				administrator: false,
-				canCreate: false,
-				canRead: false,
-				canUpdate: false,
-				canDelete: false
-			};
-		} catch (error) {
-			console.error('Error inviting user: ', error);
-		}
+	async function loadPurgatoryUsers() {
+		const purgatorySnapshot = await getDocs(collection(firestore, 'purgatory'));
+		purgatoryUsers = purgatorySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 	}
 
 	async function updateUser(user: UserProfile) {
@@ -68,77 +42,88 @@
 			console.error('Error deleting user: ', error);
 		}
 	}
+
+	async function approveUser(user: any) {
+		try {
+			// Move user from purgatory to profiles
+			await setDoc(doc(firestore, 'profiles', user.id), {
+				name: user.name,
+				email: user.email,
+				administrator: false,
+				canCreate: true,
+				canRead: true,
+				canUpdate: false,
+				canDelete: false,
+				created: user.registeredAt
+			});
+
+			// Remove user from purgatory
+			await deleteDoc(doc(firestore, 'purgatory', user.id));
+
+			// Refresh purgatory users list
+			await loadPurgatoryUsers();
+		} catch (error) {
+			console.error('Error approving user:', error);
+		}
+	}
+
+	async function rejectUser(userId: string) {
+		try {
+			// Remove user from purgatory
+			await deleteDoc(doc(firestore, 'purgatory', userId));
+
+			// Refresh purgatory users list
+			await loadPurgatoryUsers();
+		} catch (error) {
+			console.error('Error rejecting user:', error);
+		}
+	}
+
+	// Load purgatory users when the component mounts
+	loadPurgatoryUsers();
 </script>
 
 {#if isAdminUser}
 	<div class="container px-4 py-8 mx-auto">
 		<h1 class="mb-8 text-4xl font-bold text-purple-800">User Management</h1>
 
-		<div class="p-6 mb-8 bg-purple-100 rounded-lg shadow-md">
-			<h2 class="mb-4 text-2xl font-semibold text-purple-700">Invite New User</h2>
-			<form on:submit|preventDefault={inviteUser} class="space-y-4">
-				<input
-					type="text"
-					placeholder="Name"
-					bind:value={newUser.name}
-					required
-					class="w-full p-2 border border-purple-300 rounded"
-				/>
-				<input
-					type="email"
-					placeholder="Email"
-					bind:value={newUser.email}
-					required
-					class="w-full p-2 border border-purple-300 rounded"
-				/>
-				<div class="space-y-2">
-					<label class="flex items-center space-x-2">
-						<input
-							type="checkbox"
-							bind:checked={newUser.administrator}
-							class="form-checkbox text-gold-500"
-						/>
-						<span>Administrator</span>
-					</label>
-					<label class="flex items-center space-x-2">
-						<input
-							type="checkbox"
-							bind:checked={newUser.canCreate}
-							class="form-checkbox text-gold-500"
-						/>
-						<span>Can Create</span>
-					</label>
-					<label class="flex items-center space-x-2">
-						<input
-							type="checkbox"
-							bind:checked={newUser.canRead}
-							class="form-checkbox text-gold-500"
-						/>
-						<span>Can Read</span>
-					</label>
-					<label class="flex items-center space-x-2">
-						<input
-							type="checkbox"
-							bind:checked={newUser.canUpdate}
-							class="form-checkbox text-gold-500"
-						/>
-						<span>Can Update</span>
-					</label>
-					<label class="flex items-center space-x-2">
-						<input
-							type="checkbox"
-							bind:checked={newUser.canDelete}
-							class="form-checkbox text-gold-500"
-						/>
-						<span>Can Delete</span>
-					</label>
-				</div>
-				<button
-					type="submit"
-					class="px-4 py-2 text-white transition-colors bg-yellow-500 rounded hover:bg-yellow-600"
-					>Invite User</button
-				>
-			</form>
+		<div class="p-6 mb-8 bg-yellow-100 rounded-lg shadow-md">
+			<h2 class="mb-4 text-2xl font-semibold text-yellow-700">Pending Approvals</h2>
+			<div class="overflow-x-auto">
+				<table class="w-full table-auto">
+					<thead>
+						<tr class="bg-yellow-200">
+							<th class="px-4 py-2 text-left">Name</th>
+							<th class="px-4 py-2 text-left">Email</th>
+							<th class="px-4 py-2 text-left">Registered At</th>
+							<th class="px-4 py-2 text-center">Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						{#each purgatoryUsers as user}
+							<tr class="border-b border-yellow-100">
+								<td class="px-4 py-2">{user.name}</td>
+								<td class="px-4 py-2">{user.email}</td>
+								<td class="px-4 py-2">{new Date(user.registeredAt.seconds * 1000).toLocaleString()}</td>
+								<td class="px-4 py-2 text-center">
+									<button
+										on:click={() => approveUser(user)}
+										class="px-2 py-1 mr-2 text-white transition-colors bg-green-500 rounded hover:bg-green-600"
+									>
+										Approve
+									</button>
+									<button
+										on:click={() => rejectUser(user.id)}
+										class="px-2 py-1 text-white transition-colors bg-red-500 rounded hover:bg-red-600"
+									>
+										Reject
+									</button>
+								</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+			</div>
 		</div>
 
 		<div class="p-6 bg-white rounded-lg shadow-md">

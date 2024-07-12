@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { session, type SessionData, type FirebaseUser as SessionUser } from '$lib/session';
+	import { session, type SessionData } from '$lib/session';
 	import { getFirebase } from '$lib/firebase.client';
 	import {
 		GoogleAuthProvider,
@@ -18,10 +18,10 @@
 	let error: string = '';
 	let rememberMe: boolean = false;
 
-	function createSessionUser(user: User, profile: UserProfile): SessionUser {
+	function createSessionUser(user: User, profile: UserProfile): UserProfile {
 		return {
 			displayName: user.displayName,
-			email: user.email,
+			email: user.email!,
 			photoURL: user.photoURL,
 			uid: user.uid,
 			administrator: profile.administrator || false,

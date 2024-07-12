@@ -56,7 +56,9 @@
 					user: createSessionUser(result.user, userProfile),
 					loading: false
 				};
+				// In both loginWithMail and loginWithGoogle:
 				session.set(sessionData);
+				console.log('Session set:', JSON.stringify(sessionData, null, 2));
 				if (rememberMe) {
 					// Implement remember me functionality
 				}
@@ -95,7 +97,9 @@
 					user: createSessionUser(result.user, userProfile),
 					loading: false
 				};
+				// In both loginWithMail and loginWithGoogle:
 				session.set(sessionData);
+				console.log('Session set:', JSON.stringify(sessionData, null, 2));
 				goto('/dashboard');
 			} else {
 				// User is not registered, add to purgatory
@@ -132,7 +136,7 @@
 				console.warn(`User profile not found for UID: ${uid}`);
 				return null;
 			}
-			console.log('User profile found:', userProfile);
+			console.log('Full User profile found:', JSON.stringify(userProfile, null, 2));
 			return userProfile;
 		} catch (error) {
 			console.error('Error fetching user profile:', error);

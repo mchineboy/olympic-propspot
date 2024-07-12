@@ -1,20 +1,24 @@
 import { session } from '$lib/session';
 import { redirect } from '@sveltejs/kit';
 import { type UserProfile } from '$lib/users';
+import { get } from 'svelte/store';
 
-export function load() {
-  let currentUser: UserProfile | undefined | null = undefined;
+export async function load() {
+    // Wait for the session to be loaded
+    await new Promise(resolve => {
+        const unsubscribe = session.subscribe(value => {
+            unsubscribe();
+            resolve(value);
+        });
+    });
 
-  session.subscribe(value => {
-    currentUser = value.user;
-    console.log(`currentUser inside: ${JSON.stringify(currentUser, null, 2)}`);
-    if (!currentUser || !(currentUser as UserProfile).administrator) {
-      throw redirect(303, '/dashboard');
-    }  
-  });
+    const currentUser = get(session).user as UserProfile | null;
 
-  console.log(`currentUser outside: ${JSON.stringify(currentUser, null, 2)}`);
+    console.log(`currentUser: ${JSON.stringify(currentUser, null, 2)}`);
 
- 
-  return {};
+    if (!currentUser || !currentUser.administrator) {
+        throw redirect(303, '/dashboard');
+    }
+
+    return {};
 }

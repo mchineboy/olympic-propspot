@@ -90,7 +90,7 @@
 								<a href="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
 									>Your Profile</a
 								>
-								{#if $session.user?.administrator}
+								{#if sessionData.user?.administrator}
 									<a href="/admin" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
 										>Admin</a
 									>
@@ -104,7 +104,7 @@
 							</button>
 						{/if}
 					</div>
-					{#if $session.user?.administrator}
+					{#if sessionData.user?.administrator}
 						<button
 							class="p-2 ml-3 text-yellow-300 rounded-full hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-purple-900 focus:ring-white"
               

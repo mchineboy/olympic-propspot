@@ -1,16 +1,14 @@
 <script lang="ts">
-	import { session, type SessionData} from '$lib/session';
-    import { type UserProfile } from '$lib/users';
+	import { session, type SessionData } from '$lib/session';
+	import { type UserProfile } from '$lib/users';
 	import { users as props } from '$lib/users';
 	import { addDoc, collection, updateDoc, doc, deleteDoc } from 'firebase/firestore';
 	import { firestore } from '$lib/firebase';
 
-	let users: UserProfile[] = [];
-	let currentUser: UserProfile | null = null;
+	$: currentUser = $session.user as UserProfile | null;
+	$: isAdmin = currentUser?.administrator ?? false;
 
-	session.subscribe((value: SessionData) => {
-		currentUser = value.user;
-	});
+	let users: UserProfile[] = [];
 
 	let newUser: Omit<UserProfile, 'id' | 'created' | 'displayName' | 'photoURL' | 'uid'> = {
 		name: '',
@@ -69,10 +67,10 @@
 			console.error('Error deleting user: ', error);
 		}
 	}
-	console.log(currentUser)
+	console.log('Current user:', currentUser);
 </script>
 
-{#if currentUser && currentUser.administrator}
+{#if isAdmin}
 	<div class="container px-4 py-8 mx-auto">
 		<h1 class="mb-8 text-4xl font-bold text-purple-800">User Management</h1>
 

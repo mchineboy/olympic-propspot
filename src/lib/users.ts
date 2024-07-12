@@ -34,11 +34,11 @@ function userStore() {
             const docRef = doc(firestore, 'profiles', firebaseId);
             const docSnap = await getDoc(docRef);
             
-            if (!docSnap.exists()) {
+            if (docSnap.exists()) {
+                return { uid: docSnap.id, ...docSnap.data() } as UserProfile;
+            } else {
                 return null;
             }
-        
-            return { ...docSnap.data(), uid: docSnap.id } as UserProfile;
         },
         init: () => {
             onSnapshot(collection(firestore, "profiles"), (snapshot) => {

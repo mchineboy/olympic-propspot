@@ -20,11 +20,11 @@
 
 	function createSessionUser(user: User, profile: UserProfile): UserProfile {
 		return {
-			displayName: user.displayName,
-			email: user.email!,
-			photoURL: user.photoURL,
-			uid: user.uid,
-			administrator: profile.administrator || false,
+			...profile, // This spreads all properties from the profile
+			displayName: user.displayName || profile.name,
+			email: user.email || profile.email,
+			photoURL: user.photoURL || undefined,
+			uid: user.uid
 		};
 	}
 
@@ -43,11 +43,11 @@
 		try {
 			const firebase = getFirebase();
 			if (!firebase) {
-				throw new Error("Firebase is not initialized");
+				throw new Error('Firebase is not initialized');
 			}
 			const { auth } = firebase;
 			const result: UserCredential = await signInWithEmailAndPassword(auth, email, password);
-			
+
 			const userProfile = await getUserProfile(result.user.uid);
 
 			if (userProfile) {
@@ -81,14 +81,14 @@
 		try {
 			const firebase = getFirebase();
 			if (!firebase) {
-				throw new Error("Firebase is not initialized");
+				throw new Error('Firebase is not initialized');
 			}
 			const { auth, db } = firebase;
 			const provider: GoogleAuthProvider = new GoogleAuthProvider();
 			const result: UserCredential = await signInWithPopup(auth, provider);
-			
+
 			const userProfile = await getUserProfile(result.user.uid);
-			
+
 			if (userProfile) {
 				const sessionData: SessionData = {
 					loggedIn: true,
@@ -105,12 +105,13 @@
 					registeredAt: new Date(),
 					status: 'pending'
 				});
-				
+
 				// Sign out the user
 				await auth.signOut();
-				
+
 				// Show notification
-				error = 'Your account is pending approval. Please wait for an administrator to approve your account.';
+				error =
+					'Your account is pending approval. Please wait for an administrator to approve your account.';
 			}
 		} catch (e: unknown) {
 			console.trace(e);

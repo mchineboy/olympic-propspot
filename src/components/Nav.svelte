@@ -14,6 +14,8 @@
 
 	$: sessionData = $session || defaultSession;
 	$: user = sessionData.user;
+
+  console.log(`Nav: loading=${loading}, loggedIn=${loggedIn}, user=${JSON.stringify(user, null, 2)}`);
 </script>
 
 <nav class="bg-purple-900 shadow-lg">

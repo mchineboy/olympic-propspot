@@ -1,9 +1,9 @@
 import { writable } from "svelte/store";
-import { onSnapshot, collection, query, where, doc, getDoc, getDocs, type DocumentData, type Timestamp } from "firebase/firestore";
+import { onSnapshot, collection, query, where, doc, setDoc, deleteDoc, getDoc, getDocs, type DocumentData, type Timestamp } from "firebase/firestore";
 import { firestore } from "./firebase";
 
 export interface UserProfile extends DocumentData {
-    id: string;
+    uid: string;
     name?: string;
     email?: string;
     administrator?: boolean;
@@ -28,7 +28,7 @@ function userStore() {
             }
 
             const userDoc = querySnapshot.docs[0];
-            return { ...userDoc.data(), id: userDoc.id } as UserProfile;
+            return { ...userDoc.data(), uid: userDoc.id } as UserProfile;
         },
         getUserByFirebaseId: async (firebaseId: string): Promise<UserProfile | null> => {
             const docRef = doc(firestore, 'profiles', firebaseId);
@@ -38,17 +38,33 @@ function userStore() {
                 return null;
             }
         
-            return { ...docSnap.data(), id: docSnap.id } as UserProfile;
+            return { ...docSnap.data(), uid: docSnap.id } as UserProfile;
         },
         init: () => {
             onSnapshot(collection(firestore, "profiles"), (snapshot) => {
                 const props: UserProfile[] = [];
                 snapshot.forEach((post) => {
-                    props.push({ ...post.data(), id: post.id } as UserProfile);
+                    props.push({ ...post.data(), uid: post.id } as UserProfile);
                 });
                 set(props);
             });
-        }
+        },
+        getPurgatoryUsers: async (): Promise<UserProfile[]> => {
+            const purgatorySnapshot = await getDocs(collection(firestore, "purgatory"));
+            return purgatorySnapshot.docs.map(doc => ({ ...doc.data(), uid: doc.id } as UserProfile));
+        },
+        approveUser: async (userId: string, permissions: Partial<UserProfile>) => {
+            const purgatoryDoc = await getDoc(doc(firestore, "purgatory", userId));
+            if (purgatoryDoc.exists()) {
+            const userData = purgatoryDoc.data();
+            await setDoc(doc(firestore, "profiles", userId), {
+                ...userData,
+                ...permissions,
+                approved: true
+            });
+            await deleteDoc(doc(firestore, "purgatory", userId));
+            }
+        },
     };
 }
 

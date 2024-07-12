@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { session } from '$lib/session';
+	import { session, type SessionData, type FirebaseUser as SessionUser } from '$lib/session';
 	import { getFirebase } from '$lib/firebase.client';
 	import {
 		GoogleAuthProvider,
@@ -10,6 +10,7 @@
 	} from 'firebase/auth';
 	import { goto } from '$app/navigation';
 	import { users, type UserProfile } from '$lib/users';
+	import { doc, setDoc, getDoc } from 'firebase/firestore';
 
 	let email: string = '';
 	let password: string = '';
@@ -17,24 +18,12 @@
 	let error: string = '';
 	let rememberMe: boolean = false;
 
-	interface SessionUser {
-		displayName: string | null;
-		email: string | null;
-		photoURL: string | null;
-		uid: string;
-	}
-
-	interface SessionData {
-		loggedIn: boolean;
-		user: SessionUser;
-	}
-
 	function createSessionUser(user: User): SessionUser {
 		return {
 			displayName: user.displayName,
 			email: user.email,
 			photoURL: user.photoURL,
-			uid: user.uid
+			uid: user.uid,
 		};
 	}
 
@@ -59,10 +48,11 @@
 			const result: UserCredential = await signInWithEmailAndPassword(auth, email, password);
 			const sessionData: SessionData = {
 				loggedIn: true,
-				user: createSessionUser(result.user)
+				user: createSessionUser(result.user) as UserProfile,
+				loading: false
 			};
 
-			if (!sessionData.user.email) {
+			if (!sessionData.user || !sessionData.user.email) {
 				throw new Error('User email not found');
 			}
 
@@ -97,28 +87,40 @@
 			if (!firebase) {
 				throw new Error("Firebase is not initialized");
 			}
-			const { auth } = firebase;
+			const { auth, db } = firebase;
 			const provider: GoogleAuthProvider = new GoogleAuthProvider();
 			const result: UserCredential = await signInWithPopup(auth, provider);
-			const sessionData: SessionData = {
-				loggedIn: true,
-				user: createSessionUser(result.user)
-			};
-
-			const userProfile = await getUserProfile();
-
-			if (userProfile) {
-				sessionData.user = { ...sessionData.user, ...userProfile };
+			
+			// Check if user already exists in profiles collection
+			const userProfileDoc = await getDoc(doc(db, 'profiles', result.user.uid));
+			
+			if (userProfileDoc.exists()) {
+				// User is already registered and approved
+				const userProfile = userProfileDoc.data() as UserProfile;
+				const sessionData: SessionData = {
+					loggedIn: true,
+					user: { ...createSessionUser(result.user), ...userProfile } as UserProfile,
+					loading: false
+				};
 				session.set(sessionData);
 				goto('/dashboard');
 			} else {
-				// Handle case where user is not found
-				goto('/login');
+				// User is not registered, add to purgatory
+				await setDoc(doc(db, 'purgatory', result.user.uid), {
+					name: result.user.displayName,
+					email: result.user.email,
+					registeredAt: new Date(),
+					status: 'pending'
+				});
+				
+				// Sign out the user
+				await auth.signOut();
+				
+				// Show notification
+				error = 'Your account is pending approval. Please wait for an administrator to approve your account.';
 			}
-			goto('/dashboard')
 		} catch (e: unknown) {
 			console.trace(e);
-
 			if (e instanceof Error) {
 				error = e.message;
 			} else {
@@ -246,6 +248,14 @@
 						</span>
 					</button>
 				</div>
+			</div>
+			<div class="mt-4 text-center">
+				<p class="text-yellow-400">
+					Don't have an account? 
+					<a href="/register" class="font-medium text-yellow-300 underline hover:text-yellow-200">
+						Register here
+					</a>
+				</p>
 			</div>
 		</div>
 	</div>

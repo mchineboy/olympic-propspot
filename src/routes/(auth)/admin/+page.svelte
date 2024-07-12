@@ -69,6 +69,7 @@
 			console.error('Error deleting user: ', error);
 		}
 	}
+	console.log(currentUser)
 </script>
 
 {#if currentUser && currentUser.administrator}

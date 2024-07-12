@@ -48,6 +48,19 @@
         <p class="mb-1 text-purple-600">Hair Length: {prop.hairLength || 'N/A'}</p>
         <p class="mb-1 text-purple-600">Hair Style: {prop.hairStyle || 'N/A'}</p>
       {/if}
+      
+      {#if prop.tags && prop.tags.length > 0}
+        <div class="mt-2">
+          <p class="mb-1 text-sm font-semibold text-purple-700">Tags:</p>
+          <div class="flex flex-wrap gap-2">
+            {#each prop.tags as tag}
+              <span class="px-2 py-1 text-xs font-medium text-purple-700 bg-purple-100 rounded-full">
+                {tag}
+              </span>
+            {/each}
+          </div>
+        </div>
+      {/if}
   </div>
   <div class="flex justify-between pt-4 mt-4 border-t border-purple-200">
     <button on:click={editProp} class="px-3 py-1 font-bold text-white rounded bg-gold-500 hover:bg-gold-600">

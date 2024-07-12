@@ -9,7 +9,11 @@
 	import '../../app.css';
 
 	import type { LayoutData } from './$types';
-	export let data: LayoutData;
+    
+	export const data: LayoutData = {
+	  getAuthUser: () => Promise.resolve(false),
+	  url: ''
+	};
 
 	let loading: boolean = true;
 	let loggedIn: boolean = false;

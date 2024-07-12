@@ -66,13 +66,17 @@ export function isAdmin(user: SessionData['user']): boolean {
 }
 
 export async function requireAdmin() {
+    console.log('requireAdmin started');
     return new Promise<void>((resolve, reject) => {
         const unsubscribe = session.subscribe(({ user, loading }) => {
+            console.log('Session state:', { user, loading });
             if (!loading) {
                 unsubscribe();
                 if (isAdmin(user)) {
+                    console.log('User is admin, resolving');
                     resolve();
                 } else {
+                    console.log('User is not admin, rejecting');
                     reject(new Error('Not authorized'));
                 }
             }

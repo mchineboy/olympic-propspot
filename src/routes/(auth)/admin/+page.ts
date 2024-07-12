@@ -1,13 +1,15 @@
 import { requireAdmin } from '$lib/auth.service';
 import { error } from '@sveltejs/kit';
-import type { Load } from '@sveltejs/kit';
 
-export const load: Load = async () => {
+export async function load() {
+    console.log('Admin page load function started');
     try {
+        console.log('Calling requireAdmin()');
         await requireAdmin();
-        // No additional data is loaded, we're just checking for admin access
+        console.log('Admin access granted');
         return {};
     } catch (e) {
-        throw error(403, `Not authorized: ` + (e as Error).message);
+        console.error('Admin access denied:', e);
+        throw error(403, 'Not authorized');
     }
-};
+}

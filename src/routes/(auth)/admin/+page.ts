@@ -1,5 +1,5 @@
 import { session } from '$lib/session';
-import { redirect } from '@sveltejs/kit';
+// import { redirect } from '@sveltejs/kit';
 import { type UserProfile } from '$lib/users';
 
 export function load() {

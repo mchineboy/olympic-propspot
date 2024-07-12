@@ -157,7 +157,7 @@
 			<div class="mt-4 text-center">
 				<p class="text-yellow-400">
 					Don't have an account?
-					<a href="/register" class="font-medium text-yellow-300 underline hover:text-yellow-200">
+					<a href="/registration" class="font-medium text-yellow-300 underline hover:text-yellow-200">
 						Register here
 					</a>
 				</p>

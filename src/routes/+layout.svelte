@@ -16,7 +16,7 @@
 </script>
 
 {#if !$page.url.pathname.startsWith('/dashboard') && !$page.url.pathname.startsWith('/admin')}
-    {#if $page.url.pathname !== '/login' && $page.url.pathname !== '/register'}
+    {#if $page.url.pathname !== '/login' && $page.url.pathname !== '/registration'}
         <Nav loading={loading} loggedIn={loggedIn} logout={() => {}} />
     {/if}
 {/if}

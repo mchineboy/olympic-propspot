@@ -7,6 +7,7 @@ export interface FirebaseUser {
   email: string | null;
   photoURL: string | null;
   uid: string;
+  administrator: boolean;
 }
 
 export interface SessionData {

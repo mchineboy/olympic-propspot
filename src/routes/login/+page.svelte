@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { session, type SessionData, type FirebaseUser as SessionUser } from '$lib/session';
+	import { session, type SessionData } from '$lib/session';
 	import { getFirebase } from '$lib/firebase.client';
 	import {
 		GoogleAuthProvider,
@@ -18,12 +18,13 @@
 	let error: string = '';
 	let rememberMe: boolean = false;
 
-	function createSessionUser(user: User): SessionUser {
+	function createSessionUser(user: User, profile: UserProfile): UserProfile {
 		return {
 			displayName: user.displayName,
-			email: user.email,
+			email: user.email!,
 			photoURL: user.photoURL,
 			uid: user.uid,
+			administrator: profile.administrator || false
 		};
 	}
 
@@ -42,24 +43,19 @@
 		try {
 			const firebase = getFirebase();
 			if (!firebase) {
-				throw new Error("Firebase is not initialized");
+				throw new Error('Firebase is not initialized');
 			}
 			const { auth } = firebase;
 			const result: UserCredential = await signInWithEmailAndPassword(auth, email, password);
-			const sessionData: SessionData = {
-				loggedIn: true,
-				user: createSessionUser(result.user) as UserProfile,
-				loading: false
-			};
-
-			if (!sessionData.user || !sessionData.user.email) {
-				throw new Error('User email not found');
-			}
 
 			const userProfile = await getUserProfile();
 
 			if (userProfile) {
-				sessionData.user = { ...sessionData.user, ...userProfile };
+				const sessionData: SessionData = {
+					loggedIn: true,
+					user: createSessionUser(result.user, userProfile),
+					loading: false
+				};
 				session.set(sessionData);
 				if (rememberMe) {
 					// Implement remember me functionality
@@ -67,6 +63,7 @@
 				goto('/dashboard');
 			} else {
 				// Handle case where user is not found
+				error = 'User profile not found';
 			}
 		} catch (e: unknown) {
 			if (e instanceof Error) {
@@ -80,61 +77,61 @@
 	}
 
 	async function loginWithGoogle(): Promise<void> {
-		loading = true;
-		error = '';
-		try {
-			const firebase = getFirebase();
-			if (!firebase) {
-				throw new Error("Firebase is not initialized");
-			}
-			const { auth, db } = firebase;
-			const provider: GoogleAuthProvider = new GoogleAuthProvider();
-			const result: UserCredential = await signInWithPopup(auth, provider);
-			
-			// Check if user already exists in profiles collection
-			const userProfileDoc = await getDoc(doc(db, 'profiles', result.user.uid));
-			
-			if (userProfileDoc.exists()) {
-				// User is already registered and approved
-				const userProfile = userProfileDoc.data() as UserProfile;
-				const sessionData: SessionData = {
-					loggedIn: true,
-					user: { ...createSessionUser(result.user), ...userProfile } as UserProfile,
-					loading: false
-				};
-				session.set(sessionData);
-				goto('/dashboard');
-			} else {
-				// User is not registered, add to purgatory
-				await setDoc(doc(db, 'purgatory', result.user.uid), {
-					name: result.user.displayName,
-					email: result.user.email,
-					registeredAt: new Date(),
-					status: 'pending'
-				});
-				
-				// Sign out the user
-				await auth.signOut();
-				
-				// Show notification
-				error = 'Your account is pending approval. Please wait for an administrator to approve your account.';
-			}
-		} catch (e: unknown) {
-			console.trace(e);
-			if (e instanceof Error) {
-				error = e.message;
-			} else {
-				error = 'An unknown error occurred';
-			}
-		} finally {
-			loading = false;
-		}
-	}
+    loading = true;
+    error = '';
+    try {
+        const firebase = getFirebase();
+        if (!firebase) {
+            throw new Error("Firebase is not initialized");
+        }
+        const { auth, db } = firebase;
+        const provider: GoogleAuthProvider = new GoogleAuthProvider();
+        const result: UserCredential = await signInWithPopup(auth, provider);
+        
+        // Check if user already exists in profiles collection
+        const userProfileDoc = await getDoc(doc(db, 'profiles', result.user.uid));
+        
+        if (userProfileDoc.exists()) {
+            // User is already registered and approved
+            const userProfile = userProfileDoc.data() as UserProfile;
+            const sessionData: SessionData = {
+                loggedIn: true,
+                user: createSessionUser(result.user, userProfile),
+                loading: false
+            };
+            session.set(sessionData);
+            goto('/dashboard');
+        } else {
+            // User is not registered, add to purgatory
+            await setDoc(doc(db, 'purgatory', result.user.uid), {
+                name: result.user.displayName,
+                email: result.user.email,
+                registeredAt: new Date(),
+                status: 'pending'
+            });
+            
+            // Sign out the user
+            await auth.signOut();
+            
+            // Show notification
+            error = 'Your account is pending approval. Please wait for an administrator to approve your account.';
+        }
+    } catch (e: unknown) {
+        console.trace(e);
+        if (e instanceof Error) {
+            error = e.message;
+        } else {
+            error = 'An unknown error occurred';
+        }
+    } finally {
+        loading = false;
+    }
+}
 
 	async function getUserProfile(): Promise<UserProfile> {
 		const firebase = getFirebase();
 		if (!firebase) {
-			throw new Error("Firebase is not initialized");
+			throw new Error('Firebase is not initialized');
 		}
 		const { auth } = firebase;
 		const user = auth.currentUser;
@@ -144,7 +141,7 @@
 		}
 		const userProfile = await users.getUserByFirebaseId(user.uid);
 		if (!userProfile) {
-			console.trace(`User profile not found for ${user.email}: ${JSON.stringify(user, null, 2)}`)
+			console.trace(`User profile not found for ${user.email}: ${JSON.stringify(user, null, 2)}`);
 			throw new Error('User profile not found');
 		}
 		return userProfile;
@@ -251,7 +248,7 @@
 			</div>
 			<div class="mt-4 text-center">
 				<p class="text-yellow-400">
-					Don't have an account? 
+					Don't have an account?
 					<a href="/register" class="font-medium text-yellow-300 underline hover:text-yellow-200">
 						Register here
 					</a>

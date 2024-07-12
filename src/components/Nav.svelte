@@ -1,6 +1,11 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
 	import { session, defaultSession } from '$lib/session';
+    import { goto } from '$app/navigation';
+
+    function navigateToAdmin() {
+        goto('/admin');
+    }
 
 	export let loading: boolean;
 	export let loggedIn: boolean;
@@ -107,7 +112,7 @@
 					{#if sessionData.user?.administrator}
 						<button
 							class="p-2 ml-3 text-yellow-300 rounded-full hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-purple-900 focus:ring-white"
-              
+							on:click={navigateToAdmin}
 						>
 							<span class="sr-only">Settings</span>
 							<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

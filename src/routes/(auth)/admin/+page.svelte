@@ -87,44 +87,46 @@
 	<div class="container px-4 py-8 mx-auto">
 		<h1 class="mb-8 text-4xl font-bold text-purple-800">User Management</h1>
 
-		<div class="p-6 mb-8 bg-yellow-100 rounded-lg shadow-md">
-			<h2 class="mb-4 text-2xl font-semibold text-yellow-700">Pending Approvals</h2>
-			<div class="overflow-x-auto">
-				<table class="w-full table-auto">
-					<thead>
-						<tr class="bg-yellow-200">
-							<th class="px-4 py-2 text-left">Name</th>
-							<th class="px-4 py-2 text-left">Email</th>
-							<th class="px-4 py-2 text-left">Registered At</th>
-							<th class="px-4 py-2 text-center">Actions</th>
-						</tr>
-					</thead>
-					<tbody>
-						{#each purgatoryUsers as user}
-							<tr class="border-b border-yellow-100">
-								<td class="px-4 py-2">{user.name}</td>
-								<td class="px-4 py-2">{user.email}</td>
-								<td class="px-4 py-2">{new Date(user.registeredAt.seconds * 1000).toLocaleString()}</td>
-								<td class="px-4 py-2 text-center">
-									<button
-										on:click={() => approveUser(user)}
-										class="px-2 py-1 mr-2 text-white transition-colors bg-green-500 rounded hover:bg-green-600"
-									>
-										Approve
-									</button>
-									<button
-										on:click={() => rejectUser(user.id)}
-										class="px-2 py-1 text-white transition-colors bg-red-500 rounded hover:bg-red-600"
-									>
-										Reject
-									</button>
-								</td>
+		{#if purgatoryUsers.length > 0}
+			<div class="p-6 mb-8 bg-yellow-100 rounded-lg shadow-md">
+				<h2 class="mb-4 text-2xl font-semibold text-yellow-700">Pending Approvals</h2>
+				<div class="overflow-x-auto">
+					<table class="w-full table-auto">
+						<thead>
+							<tr class="bg-yellow-200">
+								<th class="px-4 py-2 text-left">Name</th>
+								<th class="px-4 py-2 text-left">Email</th>
+								<th class="px-4 py-2 text-left">Registered At</th>
+								<th class="px-4 py-2 text-center">Actions</th>
 							</tr>
-						{/each}
-					</tbody>
-				</table>
+						</thead>
+						<tbody>
+							{#each purgatoryUsers as user}
+								<tr class="border-b border-yellow-100">
+									<td class="px-4 py-2">{user.name}</td>
+									<td class="px-4 py-2">{user.email}</td>
+									<td class="px-4 py-2">{new Date(user.registeredAt.seconds * 1000).toLocaleString()}</td>
+									<td class="px-4 py-2 text-center">
+										<button
+											on:click={() => approveUser(user)}
+											class="px-2 py-1 mr-2 text-white transition-colors bg-green-500 rounded hover:bg-green-600"
+										>
+											Approve
+										</button>
+										<button
+											on:click={() => rejectUser(user.id)}
+											class="px-2 py-1 text-white transition-colors bg-red-500 rounded hover:bg-red-600"
+										>
+											Reject
+										</button>
+									</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				</div>
 			</div>
-		</div>
+		{/if}
 
 		<div class="p-6 bg-white rounded-lg shadow-md">
 			<h2 class="mb-4 text-2xl font-semibold text-purple-700">Existing Users</h2>

@@ -14,8 +14,11 @@
 
 	$: sessionData = $session || defaultSession;
 	$: user = sessionData.user;
-
-  console.log(`Nav: loading=${loading}, loggedIn=${loggedIn}, user=${JSON.stringify(user, null, 2)}`);
+	$: {
+        console.log('Session user:', $session.user);
+        console.log('Is administrator:', $session.user?.administrator);
+		console.log('Session data:', sessionData);
+    }
 </script>
 
 <nav class="bg-purple-900 shadow-lg">
@@ -101,7 +104,6 @@
 							</button>
 						{/if}
 					</div>
-					<pre class="text-xs">{JSON.stringify($session.user, null, 2)}</pre>
 					{#if $session.user?.administrator}
 						<button
 							class="p-2 ml-3 text-yellow-300 rounded-full hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-purple-900 focus:ring-white"

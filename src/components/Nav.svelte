@@ -101,7 +101,7 @@
 							</button>
 						{/if}
 					</div>
-					<pre>{JSON.stringify($session.user, null, 2)}</pre>
+					<pre class="text-xs">{JSON.stringify($session.user, null, 2)}</pre>
 					{#if $session.user?.administrator}
 						<button
 							class="p-2 ml-3 text-yellow-300 rounded-full hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-purple-900 focus:ring-white"

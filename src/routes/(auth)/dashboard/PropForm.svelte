@@ -171,7 +171,7 @@
 
   function handleTagsInput(event: Event) {
     const target = event.target as HTMLInputElement;
-    editingProp.tags = target.value.split(',').map((tag: string) => tag.trim());
+    editingProp.tags = target.value.split(',').map((tag: string) => tag.trim()).filter(Boolean);
   }
 </script>
 

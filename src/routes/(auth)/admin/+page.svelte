@@ -16,7 +16,7 @@
 
 	async function loadPurgatoryUsers() {
 		const purgatorySnapshot = await getDocs(collection(firestore, 'purgatory'));
-		purgatoryUsers = purgatorySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+		purgatoryUsers = purgatorySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 	}
 
 	async function updateUser(user: UserProfile) {
@@ -45,6 +45,8 @@
 
 	async function approveUser(user: any) {
 		try {
+			console.log('Starting user approval process');
+
 			// Move user from purgatory to profiles
 			await setDoc(doc(firestore, 'profiles', user.id), {
 				name: user.name,
@@ -54,16 +56,22 @@
 				canRead: true,
 				canUpdate: false,
 				canDelete: false,
-				created: user.registeredAt
+				created: user.registeredAt,
+				approved: true // Add this line
 			});
+			console.log('User added to profiles');
 
 			// Remove user from purgatory
 			await deleteDoc(doc(firestore, 'purgatory', user.id));
+			console.log('User removed from purgatory');
 
 			// Refresh purgatory users list
 			await loadPurgatoryUsers();
+			console.log('Purgatory users list refreshed');
 		} catch (error) {
 			console.error('Error approving user:', error);
+			// You might want to show this error to the user
+			alert('Error approving user: ' + (error as Error).message);
 		}
 	}
 
@@ -105,7 +113,9 @@
 								<tr class="border-b border-yellow-100">
 									<td class="px-4 py-2">{user.name}</td>
 									<td class="px-4 py-2">{user.email}</td>
-									<td class="px-4 py-2">{new Date(user.registeredAt.seconds * 1000).toLocaleString()}</td>
+									<td class="px-4 py-2"
+										>{new Date(user.registeredAt.seconds * 1000).toLocaleString()}</td
+									>
 									<td class="px-4 py-2 text-center">
 										<button
 											on:click={() => approveUser(user)}

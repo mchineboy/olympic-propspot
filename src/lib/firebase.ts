@@ -2,14 +2,15 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
+// Create a firebase config from the VITE_FIREBASE_* environment variables
 const firebaseConfig = {
-    apiKey: "AIzaSyBqG7CWbHWQCI4RObhqimebhhSPOmoFzIE",
-    authDomain: "ota-propspot.firebaseapp.com",
-    projectId: "ota-propspot",
-    storageBucket: "ota-propspot.appspot.com",
-    messagingSenderId: "679905341367",
-    appId: "1:679905341367:web:f305b21e6463da00f8c232",
-    measurementId: "G-VBX5DKXD72"
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    appId: import.meta.env.VITE_FIREBASE_APP_ID,
+    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 const app = initializeApp(firebaseConfig);

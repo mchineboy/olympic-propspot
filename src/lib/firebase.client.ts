@@ -3,12 +3,15 @@ import { getAuth, connectAuthEmulator, onAuthStateChanged, type Auth, type User 
 import { getFirestore, type Firestore } from 'firebase/firestore';
 import { browser } from '$app/environment';
 
+// Create a firebase config from the VITE_FIREBASE_* environment variables
 const firebaseConfig = {
-  apiKey: "AIzaSyBqG7CWbHWQCI4RObhqimebhhSPOmoFzIE",
-  appId: "1:679905341367:web:f305b21e6463da00f8c232",
-  authDomain: "ota-propspot.firebaseapp.com",
-  projectId: "ota-propspot",
-  // Add other necessary config properties here
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 let firebaseInstance: { app: FirebaseApp; auth: Auth; db: Firestore } | null = null;

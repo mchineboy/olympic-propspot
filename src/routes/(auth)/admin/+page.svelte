@@ -1,221 +1,44 @@
 <script lang="ts">
-	import { session } from '$lib/session';
-	import { isAdmin } from '$lib/auth.service';
-	import { users } from '$lib/users';
-	import type { UserProfile } from '$lib/users';
-	import { updateDoc, doc, deleteDoc, getDocs, setDoc, collection } from 'firebase/firestore';
-	import { firestore } from '$lib/firebase';
+    import { onMount } from 'svelte';
+    import { session } from '$lib/session';
+    import { isAdmin } from '$lib/auth.service';
+    import { goto } from '$app/navigation';
+    import AdminPanel from './AdminPanel.svelte';
 
-	$: currentUser = $session.user;
-	$: isAdminUser = isAdmin(currentUser);
+    let loading = true;
+    let isAdminUser = false;
 
-	let allUsers: UserProfile[] = [];
-	let purgatoryUsers: any[] = [];
+    onMount(async () => {
+        // Check if the user is logged in and is an admin
+        const user = $session.user;
+        if (!user) {
+            goto('/login'); // Redirect to login if not authenticated
+            return;
+        }
 
-	$: allUsers = $users;
+        isAdminUser = isAdmin(user);
+        if (!isAdminUser) {
+            goto('/'); // Redirect to home if not an admin
+            return;
+        }
 
-	async function loadPurgatoryUsers() {
-		const purgatorySnapshot = await getDocs(collection(firestore, 'purgatory'));
-		purgatoryUsers = purgatorySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-	}
-
-	async function updateUser(user: UserProfile) {
-		try {
-			await updateDoc(doc(firestore, 'users', user.uid), {
-				administrator: user.administrator,
-				canCreate: user.canCreate,
-				canRead: user.canRead,
-				canUpdate: user.canUpdate,
-				canDelete: user.canDelete
-			});
-			console.log('User updated:', user.uid);
-		} catch (error) {
-			console.error('Error updating user: ', error);
-		}
-	}
-
-	async function deleteUser(userId: string) {
-		try {
-			await deleteDoc(doc(firestore, 'users', userId));
-			console.log('User deleted:', userId);
-		} catch (error) {
-			console.error('Error deleting user: ', error);
-		}
-	}
-
-	async function approveUser(user: any) {
-		try {
-			console.log('Starting user approval process');
-
-			// Move user from purgatory to profiles
-			await setDoc(doc(firestore, 'profiles', user.id), {
-				name: user.name,
-				email: user.email,
-				administrator: false,
-				canCreate: true,
-				canRead: true,
-				canUpdate: false,
-				canDelete: false,
-				created: user.registeredAt,
-				approved: true // Add this line
-			});
-			console.log('User added to profiles');
-
-			// Remove user from purgatory
-			await deleteDoc(doc(firestore, 'purgatory', user.id));
-			console.log('User removed from purgatory');
-
-			// Refresh purgatory users list
-			await loadPurgatoryUsers();
-			console.log('Purgatory users list refreshed');
-		} catch (error) {
-			console.error('Error approving user:', error);
-			// You might want to show this error to the user
-			alert('Error approving user: ' + (error as Error).message);
-		}
-	}
-
-	async function rejectUser(userId: string) {
-		try {
-			// Remove user from purgatory
-			await deleteDoc(doc(firestore, 'purgatory', userId));
-
-			// Refresh purgatory users list
-			await loadPurgatoryUsers();
-		} catch (error) {
-			console.error('Error rejecting user:', error);
-		}
-	}
-
-	// Load purgatory users when the component mounts
-	loadPurgatoryUsers();
+        loading = false;
+    });
 </script>
 
-{#if isAdminUser}
-	<div class="container px-4 py-8 mx-auto">
-		<h1 class="mb-8 text-4xl font-bold text-purple-800">User Management</h1>
+<svelte:head>
+    <title>Admin Panel | Olympic PropSpot</title>
+</svelte:head>
 
-		{#if purgatoryUsers.length > 0}
-			<div class="p-6 mb-8 bg-yellow-100 rounded-lg shadow-md">
-				<h2 class="mb-4 text-2xl font-semibold text-yellow-700">Pending Approvals</h2>
-				<div class="overflow-x-auto">
-					<table class="w-full table-auto">
-						<thead>
-							<tr class="bg-yellow-200">
-								<th class="px-4 py-2 text-left">Name</th>
-								<th class="px-4 py-2 text-left">Email</th>
-								<th class="px-4 py-2 text-left">Registered At</th>
-								<th class="px-4 py-2 text-center">Actions</th>
-							</tr>
-						</thead>
-						<tbody>
-							{#each purgatoryUsers as user}
-								<tr class="border-b border-yellow-100">
-									<td class="px-4 py-2">{user.name}</td>
-									<td class="px-4 py-2">{user.email}</td>
-									<td class="px-4 py-2"
-										>{new Date(user.registeredAt.seconds * 1000).toLocaleString()}</td
-									>
-									<td class="px-4 py-2 text-center">
-										<button
-											on:click={() => approveUser(user)}
-											class="px-2 py-1 mr-2 text-white transition-colors bg-green-500 rounded hover:bg-green-600"
-										>
-											Approve
-										</button>
-										<button
-											on:click={() => rejectUser(user.id)}
-											class="px-2 py-1 text-white transition-colors bg-red-500 rounded hover:bg-red-600"
-										>
-											Reject
-										</button>
-									</td>
-								</tr>
-							{/each}
-						</tbody>
-					</table>
-				</div>
-			</div>
-		{/if}
-
-		<div class="p-6 bg-white rounded-lg shadow-md">
-			<h2 class="mb-4 text-2xl font-semibold text-purple-700">Existing Users</h2>
-			<div class="overflow-x-auto">
-				<table class="w-full table-auto">
-					<thead>
-						<tr class="bg-purple-200">
-							<th class="px-4 py-2 text-left">Name</th>
-							<th class="px-4 py-2 text-left">Email</th>
-							<th class="px-4 py-2 text-center">Admin</th>
-							<th class="px-4 py-2 text-center">Create</th>
-							<th class="px-4 py-2 text-center">Read</th>
-							<th class="px-4 py-2 text-center">Update</th>
-							<th class="px-4 py-2 text-center">Delete</th>
-							<th class="px-4 py-2 text-center">Actions</th>
-						</tr>
-					</thead>
-					<tbody>
-						{#each allUsers as user}
-							<tr class="border-b border-purple-100">
-								<td class="px-4 py-2">{user.name}</td>
-								<td class="px-4 py-2">{user.email}</td>
-								<td class="px-4 py-2 text-center"
-									><input
-										type="checkbox"
-										bind:checked={user.administrator}
-										on:change={() => updateUser(user)}
-										class="form-checkbox text-gold-500"
-									/></td
-								>
-								<td class="px-4 py-2 text-center"
-									><input
-										type="checkbox"
-										bind:checked={user.canCreate}
-										on:change={() => updateUser(user)}
-										class="form-checkbox text-gold-500"
-									/></td
-								>
-								<td class="px-4 py-2 text-center"
-									><input
-										type="checkbox"
-										bind:checked={user.canRead}
-										on:change={() => updateUser(user)}
-										class="form-checkbox text-gold-500"
-									/></td
-								>
-								<td class="px-4 py-2 text-center"
-									><input
-										type="checkbox"
-										bind:checked={user.canUpdate}
-										on:change={() => updateUser(user)}
-										class="form-checkbox text-gold-500"
-									/></td
-								>
-								<td class="px-4 py-2 text-center"
-									><input
-										type="checkbox"
-										bind:checked={user.canDelete}
-										on:change={() => updateUser(user)}
-										class="form-checkbox text-gold-500"
-									/></td
-								>
-								<td class="px-4 py-2 text-center">
-									<button
-										on:click={() => deleteUser(user.uid)}
-										class="px-2 py-1 text-white transition-colors bg-red-500 rounded hover:bg-red-600"
-										>Delete</button
-									>
-								</td>
-							</tr>
-						{/each}
-					</tbody>
-				</table>
-			</div>
-		</div>
-	</div>
+{#if loading}
+    <div class="flex items-center justify-center h-screen">
+        <div class="w-32 h-32 border-t-2 border-b-2 border-purple-500 rounded-full animate-spin"></div>
+    </div>
+{:else if isAdminUser}
+    <AdminPanel />
 {:else}
-	<div class="container px-4 py-8 mx-auto">
-		<h1 class="mb-8 text-4xl font-bold text-purple-800">Access Denied</h1>
-		<p>You do not have permission to view this page.</p>
-	</div>
+    <div class="container px-4 py-8 mx-auto">
+        <h1 class="mb-4 text-4xl font-bold text-purple-800">Access Denied</h1>
+        <p class="text-lg">You do not have permission to view this page.</p>
+    </div>
 {/if}

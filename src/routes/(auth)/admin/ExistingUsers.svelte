@@ -23,11 +23,10 @@
 
     async function deleteUser(userId: string) {
         try {
-            // Call the Cloud Function
             const functions = getFunctions();
             const deleteUserFunction = httpsCallable(functions, 'deleteUser');
             await deleteUserFunction({ uid: userId });
-
+            
             // If the Cloud Function succeeds, remove the user from local state
             allUsers = allUsers.filter(user => user.uid !== userId);
             console.log('User deleted:', userId);

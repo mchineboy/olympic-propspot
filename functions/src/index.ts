@@ -1,53 +1,51 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * import {onCall} from "firebase-functions/v2/https";
- * import {onDocumentWritten} from "firebase-functions/v2/firestore";
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
-
-// import {onRequest} from "firebase-functions/v2/https";
-// import * as logger from "firebase-functions/logger";
-
-// Start writing functions
-// https://firebase.google.com/docs/functions/typescript
-
-// export const helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
+import * as cors from 'cors';
 
 admin.initializeApp();
 
-exports.deleteUser = functions.https.onCall(async (data, context) => {
-    console.log('Delete user function called');
-    console.log('User ID to delete:', data.uid);
-    console.log('Caller UID:', context.auth?.uid);
-  
-    // Check if the caller is an admin
-    const callerProfile = await admin.firestore().collection('profiles').doc(context.auth?.uid as string).get();
-    console.log('Caller profile:', callerProfile.data());
-  
-    if (!callerProfile.exists || !callerProfile.data()!.administrator) {
-      console.log('Caller is not an admin');
-      throw new functions.https.HttpsError('permission-denied', 'Must be an admin to delete users.');
-    }
-  
-    try {
-      // Delete the user from Firebase Authentication
-      await admin.auth().deleteUser(data.uid);
-      console.log('User deleted from Authentication');
-      
-      // Delete the user's document from Firestore profiles collection
-      await admin.firestore().collection('profiles').doc(data.uid).delete();
-      console.log('User profile deleted from Firestore');
-      
-      return { success: true };
-    } catch (error) {
-      console.error('Error deleting user:', error);
-      throw new functions.https.HttpsError('internal', 'Error deleting user');
-    }
+const corsHandler = cors({origin: true});
+
+export const deleteUser = functions.https.onRequest((request, response) => {
+  return new Promise((resolve) => {
+    corsHandler(request, response, async () => {
+      if (request.method !== 'POST') {
+        response.status(405).send('Method Not Allowed');
+        return resolve();
+      }
+
+      const { uid } = request.body;
+      const authToken = request.get('Authorization')?.split('Bearer ')[1];
+
+      if (!authToken) {
+        response.status(403).send('Unauthorized');
+        return resolve();
+      }
+
+      try {
+        const decodedToken = await admin.auth().verifyIdToken(authToken);
+        
+        // Check if the caller is an admin
+        const callerProfile = await admin.firestore().collection('profiles').doc(decodedToken.uid).get();
+        
+        if (!callerProfile.exists || !callerProfile.data()?.administrator) {
+          response.status(403).send('Must be an admin to delete users.');
+          return resolve();
+        }
+
+        // Delete the user from Firebase Authentication
+        await admin.auth().deleteUser(uid);
+        
+        // Delete the user's document from Firestore profiles collection
+        await admin.firestore().collection('profiles').doc(uid).delete();
+        
+        response.status(200).send({ success: true });
+        return resolve();
+      } catch (error) {
+        console.error('Error deleting user:', error);
+        response.status(500).send('Error deleting user');
+        return resolve();
+      }
+    });
   });
+});

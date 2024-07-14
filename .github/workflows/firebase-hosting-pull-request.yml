@@ -17,8 +17,17 @@ jobs:
       - name: Create .env file
         run: echo "${{ secrets.FIREBASE_CLIENT_SECRET }}" > .env
 
-      - run: npm ci && npm run build
-      
+      - name: Install Dependencies
+        run: |
+          npm ci
+          cd functions && npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Build Functions
+        run: cd functions && npm run build
+
       - uses: FirebaseExtended/action-hosting-deploy@v0
         env:
           FIREBASE_CLI_EXPERIMENTS: webframeworks
@@ -27,3 +36,11 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_OTA_PROPSPOT }}
           projectId: ota-propspot
           channelId: ${{ github.event.pull_request.number }}
+
+      - name: Deploy Functions
+        uses: w9jds/firebase-action@master
+        with:
+          args: deploy --only functions
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          PROJECT_ID: ota-propspot

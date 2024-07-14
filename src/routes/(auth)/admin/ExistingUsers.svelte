@@ -22,6 +22,10 @@
     }
 
     async function deleteUser(userId: string) {
+        if (!userId || userId.length > 128) {
+            console.error('Invalid user ID');
+            return;
+        }
         try {
             const functions = getFunctions();
             const deleteUserFunction = httpsCallable(functions, 'deleteUser');

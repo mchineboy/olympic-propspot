@@ -31,6 +31,12 @@ export const deleteUser = functions.https.onRequest(async (request, response) =>
     return;
   }
 
+  if (!uid || typeof uid !== 'string' || uid.length > 128) {
+    console.error('Invalid UID received:', uid);
+    response.status(400).send('Invalid user ID');
+    return;
+  }
+
   try {
     const decodedToken = await admin.auth().verifyIdToken(authToken);
     

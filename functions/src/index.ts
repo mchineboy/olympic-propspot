@@ -23,6 +23,8 @@ export const deleteUser = functions.https.onRequest(async (request, response) =>
     return;
   }
 
+  console.log('Request body:', JSON.stringify(request.body, null, 2));
+
   const { uid } = request.body;
   const authToken = request.get('Authorization')?.split('Bearer ')[1];
 

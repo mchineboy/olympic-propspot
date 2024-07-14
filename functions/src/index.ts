@@ -1,6 +1,8 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 
+// What is going on with this.
+
 admin.initializeApp();
 
 export const deleteUser = functions.https.onRequest(async (request, response) => {

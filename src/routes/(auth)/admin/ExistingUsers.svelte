@@ -1,14 +1,20 @@
 <script lang="ts">
-    import { updateDoc, doc, deleteDoc } from 'firebase/firestore';
-    import { firestore } from '$lib/firebase';
+    import { getFirebase } from '$lib/firebase.client';
     import { getFunctions, httpsCallable } from 'firebase/functions';
+    import { updateDoc, doc } from 'firebase/firestore';
     import type { UserProfile } from '$lib/users';
 
     export let allUsers: UserProfile[];
 
     async function updateUser(user: UserProfile) {
+        const firebase = getFirebase();
+        if (!firebase) {
+            console.error("Firebase is not initialized");
+            return;
+        }
+
         try {
-            await updateDoc(doc(firestore, 'users', user.uid), {
+            await updateDoc(doc(firebase.db, 'users', user.uid), {
                 administrator: user.administrator,
                 canCreate: user.canCreate,
                 canRead: user.canRead,
@@ -27,7 +33,7 @@
             return;
         }
         try {
-            const functions = getFunctions();
+            const functions = getFunctions(getFirebase()?.app);
             const deleteUserFunction = httpsCallable(functions, 'deleteUser');
             await deleteUserFunction({ uid: userId });
             

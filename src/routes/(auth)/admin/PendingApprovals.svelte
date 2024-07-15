@@ -1,18 +1,30 @@
 <script lang="ts">
     import { onMount } from 'svelte';
+    import { getFirebase } from '$lib/firebase.client';
     import { getDocs, collection, deleteDoc, doc, setDoc } from 'firebase/firestore';
-    import { firestore } from '$lib/firebase';
 
     let purgatoryUsers: any[] = [];
 
     async function loadPurgatoryUsers() {
-        const purgatorySnapshot = await getDocs(collection(firestore, 'purgatory'));
+        const firebase = getFirebase();
+        if (!firebase) {
+            console.error("Firebase is not initialized");
+            return;
+        }
+
+        const purgatorySnapshot = await getDocs(collection(firebase.db, 'purgatory'));
         purgatoryUsers = purgatorySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
     }
 
     async function approveUser(user: any) {
+        const firebase = getFirebase();
+        if (!firebase) {
+            console.error("Firebase is not initialized");
+            return;
+        }
+
         try {
-            await setDoc(doc(firestore, 'profiles', user.id), {
+            await setDoc(doc(firebase.db, 'profiles', user.id), {
                 name: user.name,
                 email: user.email,
                 administrator: false,
@@ -23,7 +35,7 @@
                 created: user.registeredAt,
                 approved: true
             });
-            await deleteDoc(doc(firestore, 'purgatory', user.id));
+            await deleteDoc(doc(firebase.db, 'purgatory', user.id));
             await loadPurgatoryUsers();
         } catch (error) {
             console.error('Error approving user:', error);
@@ -32,8 +44,14 @@
     }
 
     async function rejectUser(userId: string) {
+        const firebase = getFirebase();
+        if (!firebase) {
+            console.error("Firebase is not initialized");
+            return;
+        }
+
         try {
-            await deleteDoc(doc(firestore, 'purgatory', userId));
+            await deleteDoc(doc(firebase.db, 'purgatory', userId));
             await loadPurgatoryUsers();
         } catch (error) {
             console.error('Error rejecting user:', error);

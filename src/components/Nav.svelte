@@ -46,19 +46,7 @@
 				{#if loading && !loggedIn}
 					<div class="ml-3 text-yellow-300">Loading...</div>
 				{:else if loggedIn && user}
-					<button
-						class="p-2 text-yellow-300 rounded-full hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-purple-900 focus:ring-white"
-					>
-						<span class="sr-only">Search</span>
-						<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-							/>
-						</svg>
-					</button>
+					
 					<div class="relative ml-3">
 						<div>
 							<button

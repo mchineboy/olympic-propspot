@@ -5,13 +5,45 @@
 	import PropForm from './PropForm.svelte';
 	import { onMount } from 'svelte';
 	import { session } from '$lib/session';
+	import { prefs } from '$lib/prefsStore';
+	import { get } from 'svelte/store';
+
+	let selectedType = 'All';
+	let unsubscribe: (() => void) | undefined;
+
+	onMount(() => {
+		const initPrefs = async () => {
+			const sessionData = get(session);
+			if (sessionData.loggedIn && sessionData.user) {
+				const userPrefs = await prefs.getUserPrefs(sessionData.user.uid);
+				if (userPrefs) {
+					selectedType = userPrefs.defaultPropType || 'All';
+				}
+
+				// Initialize the store
+				unsubscribe = prefs.init(sessionData.user.uid);
+			}
+		};
+
+		initPrefs();
+
+		return () => {
+			if (unsubscribe) {
+				unsubscribe();
+			}
+		};
+	});
+
+	// You can also subscribe to the store for real-time updates
+	$: if ($prefs) {
+		selectedType = $prefs.defaultPropType || 'All';
+	}
 
 	let allProps: Prop[] = [];
 	let sortOption = 'lastUsed-desc';
 	let isAddDialogOpen = false;
 	let editingProp: Prop | null = null;
 
-	let selectedType = 'All';
 	let freeformFilter = '';
 
 	const availableTypes = [

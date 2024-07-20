@@ -125,8 +125,8 @@
 			on:change={sortProps}
 			class="bg-purple-100 border border-purple-300 text-purple-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 p-2.5"
 		>
-			<option value="lastUsed-desc">Last Used (Newest First)</option>
-			<option value="lastUsed-asc">Last Used (Oldest First)</option>
+			<option value="lastUsed-desc">Date Entered (Newest First)</option>
+			<option value="lastUsed-asc">Date Entered (Oldest First)</option>
 			<option value="name-asc">Name (A-Z)</option>
 			<option value="name-desc">Name (Z-A)</option>
 		</select>

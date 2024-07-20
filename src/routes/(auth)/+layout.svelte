@@ -7,7 +7,7 @@
 	import { props } from '$lib/propsStore';
 	import Nav from '$components/Nav.svelte';
 	import '../../app.css';
-	import { fade, fly } from 'svelte/transition';
+	import { fade, fly, scale } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 
 	import type { LayoutData } from './$types';
@@ -64,9 +64,10 @@
 			// Handle the error appropriately (e.g., show an error message to the user)
 		}
 	}
-	// ... your existing script code ...
 
 	let loadingProgress = 0;
+	let loadingComplete = false;
+	let curtainOpen = false;
 	let loadingTexts = [
 		'Raising the curtain...',
 		'Polishing the props...',
@@ -77,11 +78,15 @@
 
 	$: loadingText = loadingTexts[Math.floor(loadingProgress / 20)];
 
-	if (loading) {
+	$: if (loading) {
 		const interval = setInterval(() => {
 			loadingProgress += 1;
 			if (loadingProgress >= 100) {
 				clearInterval(interval);
+				loadingComplete = true;
+				setTimeout(() => {
+					curtainOpen = true;
+				}, 500); // Delay before opening the curtain
 			}
 		}, 50);
 	}
@@ -89,19 +94,33 @@
 
 <Nav {loading} {loggedIn} logout={handleLogout} />
 
-{#if loading}
+{#if loading || loadingComplete}
   <div class="fixed inset-0 z-50 flex items-center justify-center text-yellow-400 bg-purple-900">
     <div class="mx-auto text-center w-72">
       <h1 in:fly="{{ y: 50, duration: 1000, easing: cubicOut }}" class="mb-4 text-4xl font-bold">Olympic PropSpot</h1>
-      <div class="relative w-full h-4 mb-4 overflow-hidden bg-purple-700 rounded-full">
-        <div 
-          class="absolute top-0 left-0 h-full transition-all duration-300 ease-out bg-yellow-400"
-          style="width: {loadingProgress}%"
-        ></div>
-      </div>
-      <p in:fade class="text-xl">{loadingText}</p>
+      {#if !loadingComplete}
+        <div class="relative w-full h-4 mb-4 overflow-hidden bg-purple-700 rounded-full">
+          <div 
+            class="absolute top-0 left-0 h-full transition-all duration-300 ease-out bg-yellow-400"
+            style="width: {loadingProgress}%"
+          ></div>
+        </div>
+        <p in:fade class="text-xl">{loadingText}</p>
+      {:else}
+        <p in:scale class="text-2xl">Welcome to the show!</p>
+      {/if}
     </div>
   </div>
+  {#if curtainOpen}
+    <div 
+      class="curtain-left"
+      in:fly="{{ x: -window.innerWidth/2, duration: 1000, easing: cubicOut }}"
+    ></div>
+    <div 
+      class="curtain-right"
+      in:fly="{{ x: window.innerWidth/2, duration: 1000, easing: cubicOut }}"
+    ></div>
+  {/if}
 {:else if !loggedIn}
   <div in:fade class="fixed inset-0 z-50 flex items-center justify-center text-yellow-400 bg-purple-900">
     <p class="text-2xl">Redirecting to login...</p>
@@ -121,5 +140,22 @@
 
   .bg-purple-900 {
     animation: spotlight 3s infinite;
+  }
+
+  .curtain-left, .curtain-right {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    width: 50%;
+    background-color: #4C1D95;
+    z-index: 60;
+  }
+
+  .curtain-left {
+    left: 0;
+  }
+
+  .curtain-right {
+    right: 0;
   }
 </style>

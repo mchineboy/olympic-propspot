@@ -111,24 +111,27 @@
       {/if}
     </div>
   </div>
-  {#if curtainOpen}
-    <div 
-      class="curtain-left"
-      in:fly="{{ x: -window.innerWidth/2, duration: 1000, easing: cubicOut }}"
-    ></div>
-    <div 
-      class="curtain-right"
-      in:fly="{{ x: window.innerWidth/2, duration: 1000, easing: cubicOut }}"
-    ></div>
-  {/if}
-{:else if !loggedIn}
-  <div in:fade class="fixed inset-0 z-50 flex items-center justify-center text-yellow-400 bg-purple-900">
-    <p class="text-2xl">Redirecting to login...</p>
-  </div>
-{:else}
+{/if}
+
+{#if curtainOpen}
+  <div 
+    class="curtain-left"
+    out:fly="{{ x: -window.innerWidth/2, duration: 1000, easing: cubicOut }}"
+  ></div>
+  <div 
+    class="curtain-right"
+    out:fly="{{ x: window.innerWidth/2, duration: 1000, easing: cubicOut }}"
+  ></div>
+{/if}
+
+{#if !loading && loggedIn}
   <div in:fade>
     <h1 class="px-8 font-sans text-xs italic text-right text-purple-800">Welcome, {user.displayName}</h1>
     <slot />
+  </div>
+{:else if !loading && !loggedIn}
+  <div in:fade class="fixed inset-0 z-50 flex items-center justify-center text-yellow-400 bg-purple-900">
+    <p class="text-2xl">Redirecting to login...</p>
   </div>
 {/if}
 

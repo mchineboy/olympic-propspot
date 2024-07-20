@@ -169,7 +169,7 @@
 			class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-gray-600 bg-opacity-50"
 		>
 			<div
-				class="relative w-full max-w-md p-4 mx-4 my-8 bg-white rounded-lg shadow-xl sm:p-6 md:p-8"
+				class="relative w-full max-w-lg p-4 mx-4 my-8 bg-white rounded-lg shadow-xl sm:p-6 md:p-8"
 			>
 				<button
 					on:click={closeDialog}

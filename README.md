@@ -4,9 +4,9 @@ Welcome to the most dramatic, spectacular, and downright theatrical asset manage
 
 ## 🎟️ What's This Show All About?
 
-Olympic PropSpot is the ultimate backstage pass to managing your theatrical props, costumes, and sets. It's like having a personal stage manager for all your theatrical assets! 
+Olympic PropSpot is the ultimate backstage pass to managing your theatrical props, costumes, and sets. It's like having a personal stage manager for all your theatrical assets!
 
-### 🌟 Star-Studded Features:
+### 🌟 Star-Studded Features
 
 - 🔐 Secure user authentication (because we can't have just anyone accessing our precious props!)
 - 👑 Admin dashboard (for those who like to feel important)

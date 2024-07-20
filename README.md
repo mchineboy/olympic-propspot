@@ -104,7 +104,7 @@ We welcome all stagehands, set designers, and code performers! Check out our [CO
 
 ## 📜 License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details. It's basically "break a leg, but don't break the law"!
+This project is licensed under the GNU Affero General Public License v3.0 - see the [LICENSE.md](LICENSE.md) file for details. It's essentially saying "share and improve the code, but keep it open for everyone"!
 
 ---
 

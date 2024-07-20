@@ -331,7 +331,7 @@
     <MobileImageUpload
       images={editingProp.imageUrls}
       on:change={handleImagesChange}
-      aria-labelledby="prop-images-label"
+      ariaLabel="prop-images-label"
     />
   </div>
 

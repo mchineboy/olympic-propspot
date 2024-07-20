@@ -77,7 +77,6 @@
 		return newProp as Prop;
 	}
 
-
 	function handleImagesChange(event: CustomEvent<string[]>) {
 		editingProp.update((prop) => ({ ...prop, imageUrls: event.detail }));
 	}
@@ -170,6 +169,7 @@
 	}
 
 	// This function handles changes to the attributes
+
 	function handleAttributesChange(event: CustomEvent<PropAttribute[]>) {
 		editingProp.update((prop) => ({ ...prop, attributes: event.detail }));
 	}
@@ -201,7 +201,7 @@
 		</select>
 	</div>
 
-  <div>
+	<div>
 		<label for="prop-name" class="block text-sm font-medium text-purple-700">Name</label>
 		<input
 			type="text"

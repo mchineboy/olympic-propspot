@@ -29,6 +29,7 @@ export interface Prop extends DocumentData {
     category?: Category | undefined;
     type?: string;
     imageUrl?: string;
+    imageUrls?: string[];
     imagePreviewUrl?: string;
     lastUsed?: Timestamp;
     location?: string;

@@ -32,6 +32,7 @@ export interface Prop extends DocumentData {
     imageUrls?: string[];
     imagePreviewUrl?: string;
     lastUsed?: Timestamp;
+    created?: Timestamp;
     location?: string;
     color?: string;
     size?: string;

@@ -6,6 +6,7 @@
 	import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 	import AttributeList from './AttributeList.svelte';
 	import MobileImageUpload from '$components/MobileImageUpload.svelte';
+	import { Timestamp } from 'firebase/firestore';
 
 	export let prop: Prop | null = null;
 	export let canCreate: boolean = false;
@@ -64,7 +65,9 @@
 			hairStyle: '',
 			attributes: [],
 			notes: '',
-			tags: []
+			tags: [],
+			lastUsed: Timestamp.now(),
+			created: Timestamp.now()
 		};
 	}
 
@@ -73,6 +76,12 @@
 		if (newProp.imageUrl && !newProp.imageUrls) {
 			newProp.imageUrls = [newProp.imageUrl];
 			delete newProp.imageUrl;
+		}
+		if (!newProp.lastUsed) {
+			newProp.lastUsed = Timestamp.now();
+		}
+		if (!newProp.created) {
+			newProp.created = Timestamp.now();
 		}
 		return newProp as Prop;
 	}
@@ -97,7 +106,10 @@
 
 			const propToSave = {
 				...$editingProp,
-				imageUrls: imageUrls
+				imageUrls: imageUrls,
+				lastUsed: Timestamp.fromDate(
+					new Date($editingProp.lastUsed ? $editingProp.lastUsed.toDate() : new Date())
+				)
 			};
 
 			if (propToSave.id) {
@@ -109,6 +121,7 @@
 				if (!canCreate) {
 					throw new Error('You do not have permission to create new props.');
 				}
+				propToSave.created = Timestamp.now();
 				await props.addProp(propToSave);
 			}
 			dispatch('save');
@@ -144,7 +157,6 @@
 		}
 	}
 
-	// This function was not truncated, but it's important for handling category changes
 	function handleCategoryChange() {
 		editingProp.update((prop) => {
 			if (prop.category && prop.category in types) {
@@ -159,7 +171,6 @@
 		});
 	}
 
-	// This function handles changes to the tags input
 	function handleTagsInput(event: Event) {
 		const target = event.target as HTMLInputElement;
 		editingProp.update((prop) => ({
@@ -167,8 +178,6 @@
 			tags: target.value.split(',').map((tag: string) => tag.trim())
 		}));
 	}
-
-	// This function handles changes to the attributes
 
 	function handleAttributesChange(event: CustomEvent<PropAttribute[]>) {
 		editingProp.update((prop) => ({ ...prop, attributes: event.detail }));
@@ -342,6 +351,16 @@
 			id="prop-tags"
 			value={$editingProp.tags?.join(', ')}
 			on:input={handleTagsInput}
+			class="block w-full mt-1 border-purple-300 rounded-md shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-500 focus:ring-opacity-50"
+		/>
+	</div>
+
+	<div>
+		<label for="prop-last-used" class="block text-sm font-medium text-purple-700">Last Used</label>
+		<input
+			type="date"
+			id="prop-last-used"
+			bind:value={$editingProp.lastUsed}
 			class="block w-full mt-1 border-purple-300 rounded-md shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-500 focus:ring-opacity-50"
 		/>
 	</div>

@@ -367,12 +367,13 @@
 
 	<div>
 		<label id="prop-images-label" class="block mb-2 text-sm font-medium text-purple-700"
-			>Images</label
+			for= "prop-images">Images</label
 		>
 		<MobileImageUpload
 			images={$editingProp.imageUrls}
 			on:change={handleImagesChange}
 			ariaLabel="prop-images-label"
+			id="prop-images"
 		/>
 	</div>
 

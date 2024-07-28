@@ -99,10 +99,16 @@
 			}
 
 			let imageUrls: string[] = [];
-
-			if ($editingProp.imageUrls && $editingProp.imageUrls.length > 0) {
-				imageUrls = await Promise.all($editingProp.imageUrls.map(uploadImage));
-			}
+			
+			if ($editingProp.imageUrls)
+				for (const imageData of $editingProp.imageUrls) {
+					if (imageData.startsWith('data:')) {
+						const uploadedUrl = await uploadImage(imageData);
+						imageUrls.push(uploadedUrl);
+					} else {
+						imageUrls.push(imageData);
+					}
+				}
 
 			// Ensure lastUsed is always a Timestamp
 			let lastUsed: Timestamp;
@@ -191,6 +197,7 @@
 		editingProp.update((prop) => ({ ...prop, attributes: event.detail }));
 	}
 </script>
+
 <form on:submit|preventDefault={saveProp} class="space-y-4">
 	{#if error}
 		<div
@@ -367,15 +374,15 @@
 		<input
 			type="date"
 			id="prop-last-used"
-			value={$editingProp.lastUsed instanceof Date 
-				? $editingProp.lastUsed.toISOString().substr(0, 10) 
-				: $editingProp.lastUsed instanceof Timestamp 
+			value={$editingProp.lastUsed instanceof Date
+				? $editingProp.lastUsed.toISOString().substr(0, 10)
+				: $editingProp.lastUsed instanceof Timestamp
 					? $editingProp.lastUsed.toDate().toISOString().substr(0, 10)
 					: ''}
 			on:change={(e) => {
 				if (e.target instanceof HTMLInputElement && e.target.value) {
 					const date = new Date(e.target.value);
-					editingProp.update(prop => ({...prop, lastUsed: Timestamp.fromDate(date)}));
+					editingProp.update((prop) => ({ ...prop, lastUsed: Timestamp.fromDate(date) }));
 				}
 			}}
 			class="block w-full mt-1 border-purple-300 rounded-md shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-500 focus:ring-opacity-50"
@@ -383,9 +390,13 @@
 	</div>
 
 	<div>
-		<label id="prop-images-label" class="block mb-2 text-sm font-medium text-purple-700"
-			for="prop-images">Images</label
+		<label
+			id="prop-images-label"
+			class="block mb-2 text-sm font-medium text-purple-700"
+			for="prop-images"
 		>
+			Images
+		</label>
 		<MobileImageUpload
 			images={$editingProp.imageUrls}
 			on:change={handleImagesChange}

@@ -108,7 +108,7 @@
 			let lastUsed: Timestamp;
 			if ($editingProp.lastUsed instanceof Timestamp) {
 				lastUsed = $editingProp.lastUsed;
-			} else if ($editingProp.lastUsed instanceof Date) {
+			} else if ($editingProp.lastUsed && ($editingProp.lastUsed as any) instanceof Date) {
 				lastUsed = Timestamp.fromDate($editingProp.lastUsed);
 			} else {
 				lastUsed = Timestamp.now();
@@ -367,10 +367,16 @@
 		<input
 			type="date"
 			id="prop-last-used"
-			bind:value={$editingProp.lastUsed instanceof Timestamp ? $editingProp.lastUsed.toDate() : $editingProp.lastUsed}
+			value={$editingProp.lastUsed instanceof Date 
+				? $editingProp.lastUsed.toISOString().substr(0, 10) 
+				: $editingProp.lastUsed instanceof Timestamp 
+					? $editingProp.lastUsed.toDate().toISOString().substr(0, 10)
+					: ''}
 			on:change={(e) => {
-				const date = new Date(e.target.value);
-				editingProp.update(prop => ({...prop, lastUsed: Timestamp.fromDate(date)}));
+				if (e.target instanceof HTMLInputElement && e.target.value) {
+					const date = new Date(e.target.value);
+					editingProp.update(prop => ({...prop, lastUsed: Timestamp.fromDate(date)}));
+				}
 			}}
 			class="block w-full mt-1 border-purple-300 rounded-md shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-500 focus:ring-opacity-50"
 		/>

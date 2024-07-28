@@ -104,12 +104,20 @@
 				imageUrls = await Promise.all($editingProp.imageUrls.map(uploadImage));
 			}
 
+			// Ensure lastUsed is always a Timestamp
+			let lastUsed: Timestamp;
+			if ($editingProp.lastUsed instanceof Timestamp) {
+				lastUsed = $editingProp.lastUsed;
+			} else if ($editingProp.lastUsed instanceof Date) {
+				lastUsed = Timestamp.fromDate($editingProp.lastUsed);
+			} else {
+				lastUsed = Timestamp.now();
+			}
+
 			const propToSave = {
 				...$editingProp,
 				imageUrls: imageUrls,
-				lastUsed: Timestamp.fromDate(
-					new Date($editingProp.lastUsed ? $editingProp.lastUsed.toDate() : new Date())
-				)
+				lastUsed: lastUsed
 			};
 
 			if (propToSave.id) {
@@ -183,7 +191,6 @@
 		editingProp.update((prop) => ({ ...prop, attributes: event.detail }));
 	}
 </script>
-
 <form on:submit|preventDefault={saveProp} class="space-y-4">
 	{#if error}
 		<div
@@ -360,14 +367,18 @@
 		<input
 			type="date"
 			id="prop-last-used"
-			bind:value={$editingProp.lastUsed}
+			bind:value={$editingProp.lastUsed instanceof Timestamp ? $editingProp.lastUsed.toDate() : $editingProp.lastUsed}
+			on:change={(e) => {
+				const date = new Date(e.target.value);
+				editingProp.update(prop => ({...prop, lastUsed: Timestamp.fromDate(date)}));
+			}}
 			class="block w-full mt-1 border-purple-300 rounded-md shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-500 focus:ring-opacity-50"
 		/>
 	</div>
 
 	<div>
 		<label id="prop-images-label" class="block mb-2 text-sm font-medium text-purple-700"
-			for= "prop-images">Images</label
+			for="prop-images">Images</label
 		>
 		<MobileImageUpload
 			images={$editingProp.imageUrls}

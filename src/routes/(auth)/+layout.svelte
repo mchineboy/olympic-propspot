@@ -91,9 +91,9 @@
 
 {#if loading}
   <div class="fixed inset-0 z-50 flex items-center justify-center text-yellow-400 bg-purple-900">
-    <div class="text-center">
+    <div class="mx-auto text-center w-72">
       <h1 in:fly="{{ y: 50, duration: 1000, easing: cubicOut }}" class="mb-4 text-4xl font-bold">Olympic PropSpot</h1>
-      <div class="relative w-64 h-4 mb-4 overflow-hidden bg-purple-700 rounded-full">
+      <div class="relative w-full h-4 mb-4 overflow-hidden bg-purple-700 rounded-full">
         <div 
           class="absolute top-0 left-0 h-full transition-all duration-300 ease-out bg-yellow-400"
           style="width: {loadingProgress}%"

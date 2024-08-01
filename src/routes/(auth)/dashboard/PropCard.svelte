@@ -33,7 +33,7 @@
 			<img
 				src={prop.imageUrl}
 				alt={prop.name || 'Prop image'}
-				class="object-cover w-full h-48 mb-4 rounded-md"
+				class="object-cover w-full h-full mb-4 rounded-md"
 			/>
 		{/if}
 		<h3 class="mb-2 text-xl font-semibold text-purple-800">{prop.name || 'Unnamed Prop'}</h3>

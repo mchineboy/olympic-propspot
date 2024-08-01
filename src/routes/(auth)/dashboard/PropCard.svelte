@@ -1,7 +1,8 @@
 <script lang="ts">
 	import type { Prop } from '$lib/propsStore';
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, onMount } from 'svelte';
 	import { props } from '$lib/propsStore';
+	import { fade } from 'svelte/transition';
 
 	export let prop: Prop;
 	export let canUpdate: boolean = false;
@@ -10,6 +11,10 @@
 	const dispatch = createEventDispatcher<{ edit: Prop }>();
 
 	let currentImageIndex = 0;
+	let intervalId: any;
+	let touchStartX: number;
+	let mouseStartX: number | null;
+
 	$: images =
 		prop.imageUrls && prop.imageUrls.length > 0
 			? prop.imageUrls
@@ -33,32 +38,104 @@
 	}
 
 	function nextImage() {
-		if (currentImageIndex < images.length - 1) {
-			currentImageIndex++;
-		}
+		currentImageIndex = (currentImageIndex + 1) % images.length;
 	}
 
 	function prevImage() {
-		if (currentImageIndex > 0) {
-			currentImageIndex--;
+		currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
+	}
+
+	function startCarousel() {
+		if (images.length > 1) {
+			intervalId = setInterval(nextImage, 10000);
 		}
 	}
+
+	function stopCarousel() {
+		clearInterval(intervalId);
+	}
+
+	function handleTouchStart(event: TouchEvent) {
+		touchStartX = event.touches[0].clientX;
+	}
+
+	function handleTouchEnd(event: TouchEvent) {
+		const touchEndX = event.changedTouches[0].clientX;
+		const diff = touchStartX - touchEndX;
+
+		if (Math.abs(diff) > 50) {
+			if (diff > 0) {
+				nextImage();
+			} else {
+				prevImage();
+			}
+		}
+	}
+
+	function handleMouseDown(event: MouseEvent) {
+		mouseStartX = event.clientX;
+	}
+
+	function handleMouseUp(event: MouseEvent) {
+		if (mouseStartX !== null) {
+			const diff = mouseStartX - event.clientX;
+
+			if (Math.abs(diff) > 50) {
+				if (diff > 0) {
+					nextImage();
+				} else {
+					prevImage();
+				}
+			}
+
+			mouseStartX = null;
+		}
+	}
+
+	function handleKeyDown(event: KeyboardEvent) {
+		if (event.key === 'ArrowLeft') {
+			prevImage();
+		} else if (event.key === 'ArrowRight') {
+			nextImage();
+		}
+	}
+
+	onMount(() => {
+		startCarousel();
+		return stopCarousel;
+	});
 </script>
 
 <div class="flex flex-col h-full p-6 bg-white border border-purple-200 rounded-lg shadow-md">
 	<div class="flex-grow">
 		{#if images.length > 0}
-			<div class="relative mb-4">
-				<img
-					src={images[currentImageIndex]}
-					alt={prop.name || 'Prop image'}
-					class="object-cover w-full h-full rounded-md"
-				/>
+			<div
+				role="treegrid"
+				class="relative mb-4 overflow-hidden"
+				aria-roledescription="carousel"
+				aria-label="Prop images"
+				on:touchstart={handleTouchStart}
+				on:touchend={handleTouchEnd}
+				on:mousedown={handleMouseDown}
+				on:mouseup={handleMouseUp}
+				on:keydown={handleKeyDown}
+				tabindex="-1"
+			>
+				{#each images as image, index}
+					{#if index === currentImageIndex}
+						<img
+							src={image}
+							alt={`${prop.name || 'Prop'} image ${index + 1} of ${images.length}`}
+							class="object-cover w-full h-full rounded-md"
+							in:fade={{ duration: 300 }}
+							out:fade={{ duration: 300 }}
+						/>
+					{/if}
+				{/each}
 				{#if images.length > 1}
 					<button
 						on:click={prevImage}
 						class="absolute left-0 p-2 text-white transform -translate-y-1/2 bg-black bg-opacity-50 rounded-r top-1/2"
-						disabled={currentImageIndex === 0}
 						aria-label="Previous image"
 					>
 						&lt;
@@ -66,7 +143,6 @@
 					<button
 						on:click={nextImage}
 						class="absolute right-0 p-2 text-white transform -translate-y-1/2 bg-black bg-opacity-50 rounded-l top-1/2"
-						disabled={currentImageIndex === images.length - 1}
 						aria-label="Next image"
 					>
 						&gt;

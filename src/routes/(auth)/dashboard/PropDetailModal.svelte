@@ -34,7 +34,7 @@
   </script>
   
   {#if show}
-    <div class="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-black bg-opacity-50 pt-96" on:click|self={closeModal} transition:fade>
+    <div class="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-black bg-opacity-50" on:click|self={closeModal} transition:fade>
       <div class="relative bg-white rounded-lg shadow-xl max-w-3xl w-full m-4 max-h-[90vh] overflow-hidden" transition:fly="{{ y: 50, duration: 300 }}">
         <div class="flex items-center justify-between p-4 text-white bg-purple-800">
           <h2 class="text-2xl font-bold">{prop.name || 'Unnamed Prop'}</h2>

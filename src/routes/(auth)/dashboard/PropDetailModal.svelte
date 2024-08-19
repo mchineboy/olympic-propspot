@@ -48,7 +48,7 @@
         <div class="p-6 overflow-y-auto" style="max-height: calc(90vh - 4rem);">
           {#if images.length > 0}
             <div class="relative mb-6">
-              <img src={images[currentImageIndex]} alt={prop.name || 'Prop image'} class="object-cover w-full h-64 rounded-lg" />
+              <img src={images[currentImageIndex]} alt={prop.name || 'Prop image'} class="object-cover w-full rounded-lg" />
               {#if images.length > 1}
                 <button on:click={prevImage} class="absolute p-2 text-white transform -translate-y-1/2 bg-purple-800 rounded-full left-2 top-1/2" disabled={currentImageIndex === 0}>
                   &lt;

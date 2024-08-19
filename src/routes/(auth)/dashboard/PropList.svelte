@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Prop } from '$lib/propsStore';
   import PropCard from './PropCard.svelte';
+  import PropDetailModal from './PropDetailModal.svelte';
   import InfiniteScroll from 'svelte-infinite-scroll';
   import { session } from '$lib/session';
   
@@ -12,6 +13,9 @@
   let displayedProps: Prop[] = [];
   let page = 0;
   const pageSize = 20;
+
+  let selectedProp: Prop | null = null;
+  let showModal = false;
 
   $: {
     console.log('PropList received props:', props);
@@ -27,6 +31,15 @@
     console.log('Displayed props after loading more:', displayedProps);
   }
 
+  function handleViewProp(event: CustomEvent<Prop>) {
+    selectedProp = event.detail;
+    showModal = true;
+  }
+
+  function closeModal() {
+    showModal = false;
+  }
+
   $: userPermissions = $session.user;
 </script>
 
@@ -35,9 +48,14 @@
     <PropCard 
       {prop} 
       on:edit 
+      on:view={handleViewProp}
       canUpdate={userPermissions?.canUpdate}
       canDelete={userPermissions?.canDelete}
     />
   {/each}
   <InfiniteScroll threshold={100} on:loadMore={loadMoreProps} />
 </div>
+
+{#if selectedProp}
+  <PropDetailModal prop={selectedProp} show={showModal} on:close={closeModal} />
+{/if}

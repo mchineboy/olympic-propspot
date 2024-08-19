@@ -8,7 +8,7 @@
 	export let canUpdate: boolean = false;
 	export let canDelete: boolean = false;
 
-	const dispatch = createEventDispatcher<{ edit: Prop }>();
+	const dispatch = createEventDispatcher<{ edit: Prop; view: Prop }>();
 
 	let currentImageIndex = 0;
 	let intervalId: any;
@@ -51,8 +51,8 @@
 		}
 	}
 
-	function stopCarousel() {
-		clearInterval(intervalId);
+	function viewProp() {
+		dispatch('view', prop);
 	}
 
 	function handleTouchStart(event: TouchEvent) {
@@ -102,11 +102,13 @@
 
 	onMount(() => {
 		startCarousel();
-		return stopCarousel;
+		return () => {
+			clearInterval(intervalId);
+		};
 	});
 </script>
 
-<div class="flex flex-col h-full p-6 bg-white border border-purple-200 rounded-lg shadow-md">
+<div class="flex flex-col h-full p-6 bg-white border border-purple-200 rounded-lg shadow-md cursor-pointer" on:click={viewProp}>
 	<div class="flex-grow">
 		{#if images.length > 0}
 			<div
@@ -126,7 +128,7 @@
 						<img
 							src={image}
 							alt={`${prop.name || 'Prop'} image ${index + 1} of ${images.length}`}
-							class="object-cover w-full h-full rounded-md"
+							class="object-cover w-full h-48 rounded-md"
 							in:fade={{ duration: 300 }}
 							out:fade={{ duration: 300 }}
 						/>
@@ -134,14 +136,14 @@
 				{/each}
 				{#if images.length > 1}
 					<button
-						on:click={prevImage}
+						on:click|stopPropagation={prevImage}
 						class="absolute left-0 p-2 text-white transform -translate-y-1/2 bg-black bg-opacity-50 rounded-r top-1/2"
 						aria-label="Previous image"
 					>
 						&lt;
 					</button>
 					<button
-						on:click={nextImage}
+						on:click|stopPropagation={nextImage}
 						class="absolute right-0 p-2 text-white transform -translate-y-1/2 bg-black bg-opacity-50 rounded-l top-1/2"
 						aria-label="Next image"
 					>
@@ -194,7 +196,7 @@
 	<div class="flex justify-between pt-4 mt-4 border-t border-purple-200">
 		{#if canUpdate}
 			<button
-				on:click={editProp}
+				on:click|stopPropagation={editProp}
 				class="px-3 py-1 font-bold text-white rounded bg-gold-500 hover:bg-gold-600"
 			>
 				Edit
@@ -204,7 +206,7 @@
 		{/if}
 		{#if canDelete}
 			<button
-				on:click={deleteProp}
+				on:click|stopPropagation={deleteProp}
 				class="px-3 py-1 font-bold text-white bg-red-500 rounded hover:bg-red-600"
 			>
 				Delete

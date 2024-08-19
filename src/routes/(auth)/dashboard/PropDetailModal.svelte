@@ -69,7 +69,7 @@
 					<img
 						src={images[currentImageIndex]}
 						alt={prop.name || 'Prop image'}
-						class="object-cover w-full h-64 rounded-lg"
+						class="object-cover w-full rounded-lg"
 					/>
 					{#if images.length > 1}
 						<button

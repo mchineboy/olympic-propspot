@@ -128,7 +128,7 @@
 						<img
 							src={image}
 							alt={`${prop.name || 'Prop'} image ${index + 1} of ${images.length}`}
-							class="object-cover w-full h-48 rounded-md"
+							class="object-cover w-full rounded-md"
 							in:fade={{ duration: 300 }}
 							out:fade={{ duration: 300 }}
 						/>

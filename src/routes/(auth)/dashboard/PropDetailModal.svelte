@@ -35,93 +35,96 @@
   
   {#if show}
     <div class="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-black bg-opacity-50 pt-96" on:click|self={closeModal} transition:fade>
-      <div class="relative p-8 bg-white rounded-lg shadow-xl max-w-3xl w-full m-4 max-h-[90vh] overflow-y-auto" transition:fly="{{ y: 50, duration: 300 }}">
-        <button on:click={closeModal} class="absolute text-gray-500 top-4 right-4 hover:text-gray-700">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
-        </button>
-  
-        {#if images.length > 0}
-          <div class="relative mb-6">
-            <img src={images[currentImageIndex]} alt={prop.name || 'Prop image'} class="object-cover w-full h-64 rounded-lg" />
-            {#if images.length > 1}
-              <button on:click={prevImage} class="absolute p-2 text-white transform -translate-y-1/2 bg-black bg-opacity-50 rounded-full left-2 top-1/2" disabled={currentImageIndex === 0}>
-                &lt;
-              </button>
-              <button on:click={nextImage} class="absolute p-2 text-white transform -translate-y-1/2 bg-black bg-opacity-50 rounded-full right-2 top-1/2" disabled={currentImageIndex === images.length - 1}>
-                &gt;
-              </button>
-            {/if}
-          </div>
-        {/if}
-  
-        <h2 class="mb-4 text-2xl font-bold text-purple-800">{prop.name || 'Unnamed Prop'}</h2>
-        
-        <div class="grid grid-cols-2 gap-4">
-          <p><span class="font-semibold">ID:</span> {prop.id}</p>
-          <p><span class="font-semibold">Category:</span> {prop.category || 'N/A'}</p>
-          <p><span class="font-semibold">Type:</span> {prop.type || 'N/A'}</p>
-          <p><span class="font-semibold">Location:</span> {prop.location || 'N/A'}</p>
-          {#if prop.imagePreviewUrl}
-            <p><span class="font-semibold">Preview URL:</span> {prop.imagePreviewUrl}</p>
-          {/if}
-          {#if prop.lastUsed}
-            <p><span class="font-semibold">Last Used:</span> {prop.lastUsed.toDate().toLocaleString()}</p>
-          {/if}
-          {#if prop.created}
-            <p><span class="font-semibold">Created:</span> {prop.created.toDate().toLocaleString()}</p>
-          {/if}
-          {#if prop.color}
-            <p><span class="font-semibold">Color:</span> {prop.color}</p>
-          {/if}
-          {#if prop.size}
-            <p><span class="font-semibold">Size:</span> {prop.size}</p>
-          {/if}
-          {#if prop.material}
-            <p><span class="font-semibold">Material:</span> {prop.material}</p>
-          {/if}
-          {#if prop.hairColor}
-            <p><span class="font-semibold">Hair Color:</span> {prop.hairColor}</p>
-          {/if}
-          {#if prop.hairLength}
-            <p><span class="font-semibold">Hair Length:</span> {prop.hairLength}</p>
-          {/if}
-          {#if prop.hairStyle}
-            <p><span class="font-semibold">Hair Style:</span> {prop.hairStyle}</p>
-          {/if}
+      <div class="relative bg-white rounded-lg shadow-xl max-w-3xl w-full m-4 max-h-[90vh] overflow-hidden" transition:fly="{{ y: 50, duration: 300 }}">
+        <div class="flex items-center justify-between p-4 text-white bg-purple-800">
+          <h2 class="text-2xl font-bold">{prop.name || 'Unnamed Prop'}</h2>
+          <button on:click={closeModal} class="p-1 transition-colors duration-200 rounded-full bg-gold-500 hover:bg-gold-600">
+            <svg class="w-6 h-6 text-purple-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
         </div>
   
-        {#if prop.attributes && prop.attributes.length > 0}
-          <div class="mt-4">
-            <h3 class="mb-2 text-lg font-semibold">Additional Attributes:</h3>
-            <ul class="list-disc list-inside">
-              {#each prop.attributes as attribute}
-                <li>{attribute.name}: {attribute.value}</li>
-              {/each}
-            </ul>
-          </div>
-        {/if}
-  
-        {#if prop.notes}
-          <div class="mt-4">
-            <h3 class="mb-2 text-lg font-semibold">Notes:</h3>
-            <p>{prop.notes}</p>
-          </div>
-        {/if}
-  
-        {#if prop.tags && prop.tags.length > 0}
-          <div class="mt-4">
-            <h3 class="mb-2 text-lg font-semibold">Tags:</h3>
-            <div class="flex flex-wrap gap-2">
-              {#each prop.tags as tag}
-                <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded">
-                  {tag}
-                </span>
-              {/each}
+        <div class="p-6 overflow-y-auto" style="max-height: calc(90vh - 4rem);">
+          {#if images.length > 0}
+            <div class="relative mb-6">
+              <img src={images[currentImageIndex]} alt={prop.name || 'Prop image'} class="object-cover w-full h-64 rounded-lg" />
+              {#if images.length > 1}
+                <button on:click={prevImage} class="absolute p-2 text-white transform -translate-y-1/2 bg-purple-800 rounded-full left-2 top-1/2" disabled={currentImageIndex === 0}>
+                  &lt;
+                </button>
+                <button on:click={nextImage} class="absolute p-2 text-white transform -translate-y-1/2 bg-purple-800 rounded-full right-2 top-1/2" disabled={currentImageIndex === images.length - 1}>
+                  &gt;
+                </button>
+              {/if}
             </div>
+          {/if}
+          
+          <div class="grid grid-cols-2 gap-4">
+            <p><span class="font-semibold text-purple-800">ID:</span> {prop.id}</p>
+            <p><span class="font-semibold text-purple-800">Category:</span> {prop.category || 'N/A'}</p>
+            <p><span class="font-semibold text-purple-800">Type:</span> {prop.type || 'N/A'}</p>
+            <p><span class="font-semibold text-purple-800">Location:</span> {prop.location || 'N/A'}</p>
+            {#if prop.imagePreviewUrl}
+              <p><span class="font-semibold text-purple-800">Preview URL:</span> {prop.imagePreviewUrl}</p>
+            {/if}
+            {#if prop.lastUsed}
+              <p><span class="font-semibold text-purple-800">Last Used:</span> {prop.lastUsed.toDate().toLocaleString()}</p>
+            {/if}
+            {#if prop.created}
+              <p><span class="font-semibold text-purple-800">Created:</span> {prop.created.toDate().toLocaleString()}</p>
+            {/if}
+            {#if prop.color}
+              <p><span class="font-semibold text-purple-800">Color:</span> {prop.color}</p>
+            {/if}
+            {#if prop.size}
+              <p><span class="font-semibold text-purple-800">Size:</span> {prop.size}</p>
+            {/if}
+            {#if prop.material}
+              <p><span class="font-semibold text-purple-800">Material:</span> {prop.material}</p>
+            {/if}
+            {#if prop.hairColor}
+              <p><span class="font-semibold text-purple-800">Hair Color:</span> {prop.hairColor}</p>
+            {/if}
+            {#if prop.hairLength}
+              <p><span class="font-semibold text-purple-800">Hair Length:</span> {prop.hairLength}</p>
+            {/if}
+            {#if prop.hairStyle}
+              <p><span class="font-semibold text-purple-800">Hair Style:</span> {prop.hairStyle}</p>
+            {/if}
           </div>
-        {/if}
+  
+          {#if prop.attributes && prop.attributes.length > 0}
+            <div class="mt-4">
+              <h3 class="mb-2 text-lg font-semibold text-purple-800">Additional Attributes:</h3>
+              <ul class="list-disc list-inside">
+                {#each prop.attributes as attribute}
+                  <li><span class="font-semibold text-purple-700">{attribute.name}:</span> {attribute.value}</li>
+                {/each}
+              </ul>
+            </div>
+          {/if}
+  
+          {#if prop.notes}
+            <div class="mt-4">
+              <h3 class="mb-2 text-lg font-semibold text-purple-800">Notes:</h3>
+              <p>{prop.notes}</p>
+            </div>
+          {/if}
+  
+          {#if prop.tags && prop.tags.length > 0}
+            <div class="mt-4">
+              <h3 class="mb-2 text-lg font-semibold text-purple-800">Tags:</h3>
+              <div class="flex flex-wrap gap-2">
+                {#each prop.tags as tag}
+                  <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded">
+                    {tag}
+                  </span>
+                {/each}
+              </div>
+            </div>
+          {/if}
+        </div>
       </div>
     </div>
   {/if}

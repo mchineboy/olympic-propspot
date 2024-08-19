@@ -56,12 +56,6 @@
 	});
 </script>
 
-<style>
-    :global(body.modal-open) {
-      overflow: hidden;
-    }
-</style>
-
 {#if show}
 	<div
 		class="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-black bg-opacity-50"

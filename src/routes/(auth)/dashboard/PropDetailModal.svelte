@@ -61,6 +61,10 @@
 		class="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-black bg-opacity-50"
 		on:click|self={closeModal}
 		transition:fade
+        tabindex="0"
+        aria-label="Close modal"
+        role="button"
+        on:keydown={e => e.key === 'Escape' && closeModal()}
 	>
 		<div
 			class="relative bg-white rounded-lg shadow-xl max-w-3xl w-full m-4 max-h-[90vh] overflow-hidden"

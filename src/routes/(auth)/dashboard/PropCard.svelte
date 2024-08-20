@@ -108,7 +108,14 @@
 	});
 </script>
 
-<div class="flex flex-col h-full p-6 bg-white border border-purple-200 rounded-lg shadow-md cursor-pointer" on:click={viewProp}>
+<div
+	class="flex flex-col h-full p-6 bg-white border border-purple-200 rounded-lg shadow-md cursor-pointer"
+	on:click={viewProp}
+	role="link"
+	tabindex="0"
+	on:keydown={viewProp}
+	aria-label="View prop details"
+>
 	<div class="flex-grow">
 		{#if images.length > 0}
 			<div

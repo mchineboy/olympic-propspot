@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { fade, fly } from 'svelte/transition';
 	import type { Prop } from '$lib/propsStore';
-	import { createEventDispatcher, onMount, onDestroy } from 'svelte';
+	import { createEventDispatcher, onDestroy } from 'svelte';
 
 	export let prop: Prop;
 	export let show: boolean = false;

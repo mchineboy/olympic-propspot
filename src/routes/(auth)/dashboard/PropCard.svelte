@@ -101,7 +101,6 @@
 	}
 
 	onMount(() => {
-		startCarousel();
 		return () => {
 			clearInterval(intervalId);
 		};

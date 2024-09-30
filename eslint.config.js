@@ -28,6 +28,6 @@ export default [
 		}
 	},
 	{
-		ignores: ['build/', '.svelte-kit/', 'dist/', 'lib/**/*', 'node_modules/', 'public/', 'tmp/']
+		ignores: ['build/', '.svelte-kit/', 'dist/', 'lib/**/*', 'node_modules/', 'public/', 'tmp/', 'functions/lib']
 	}
 ];

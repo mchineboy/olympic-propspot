@@ -1,11 +1,12 @@
-import * as functions from 'firebase-functions';
+
+import { onRequest } from "firebase-functions/v2/https";
 import * as admin from 'firebase-admin';
 
 // What is going on with this.
 
 admin.initializeApp();
 
-export const deleteUser = functions.https.onRequest(async (request, response) => {
+export const deleteUserV2 = onRequest({cors: true}, async (request, response) => {
   // Set CORS headers for all responses
   response.set('Access-Control-Allow-Origin', 'https://ota-propspot.web.app');
   response.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');

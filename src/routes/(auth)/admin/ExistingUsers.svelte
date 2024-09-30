@@ -34,7 +34,7 @@
         }
         try {
             const functions = getFunctions(getFirebase()?.app);
-            const deleteUserFunction = httpsCallable(functions, 'deleteUser');
+            const deleteUserFunction = httpsCallable(functions, 'deleteUserV2');
             await deleteUserFunction({ uid: userId });
             
             // If the Cloud Function succeeds, remove the user from local state

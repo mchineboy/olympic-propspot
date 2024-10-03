@@ -35,8 +35,7 @@ jobs:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_OTA_PROPSPOT }}
           projectId: ota-propspot
-          channelId: ${{ github.event.pull_request.number }}
-          target: live
+          channelId: live
 
       - name: Deploy Functions
         uses: w9jds/firebase-action@master

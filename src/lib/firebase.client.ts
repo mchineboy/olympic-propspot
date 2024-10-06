@@ -1,5 +1,5 @@
 import { initializeApp, getApps, getApp, type FirebaseApp } from 'firebase/app';
-import { getAuth, connectAuthEmulator, onAuthStateChanged, type Auth, type User } from 'firebase/auth';
+import { getAuth, onAuthStateChanged, type Auth, type User } from 'firebase/auth';
 import { getFirestore, type Firestore } from 'firebase/firestore';
 import { browser } from '$app/environment';
 
@@ -35,11 +35,11 @@ function initializeFirebase() {
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  if (import.meta.env.VITE_FIREBASE_USE_EMULATOR === 'true') {
-    connectAuthEmulator(auth, 'http://127.0.0.1:9099');
-    // If you're also using Firestore emulator, uncomment the following line:
-    // connectFirestoreEmulator(db, 'localhost', 8080);
-  }
+  // if (import.meta.env.VITE_FIREBASE_USE_EMULATOR === 'true') {
+  //   connectAuthEmulator(auth, 'http://127.0.0.1:9099');
+  //   // If you're also using Firestore emulator, uncomment the following line:
+  //   // connectFirestoreEmulator(db, 'localhost', 8080);
+  // }
 
   firebaseInstance = { app, auth, db };
   return firebaseInstance;

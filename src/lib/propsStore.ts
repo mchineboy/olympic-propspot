@@ -155,6 +155,7 @@ function propsStore() {
               console.log("Firestore snapshot received", snapshot.size);
               const props: Prop[] = [];
               snapshot.forEach((doc) => {
+                console.log("Document data:", doc.data());
                 props.push({ ...doc.data(), id: doc.id } as Prop);
               });
               console.log('Fetched props:', props);

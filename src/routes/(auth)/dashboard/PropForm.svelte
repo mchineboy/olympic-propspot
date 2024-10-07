@@ -161,6 +161,20 @@
 		const response = await fetch(imageData);
 		const blob = await response.blob();
 
+		// normalize the images to be 1080px wide
+		const canvas = document.createElement('canvas');
+		const ctx = canvas.getContext('2d');
+		const img = new Image();
+		img.src = URL.createObjectURL(blob);
+		await new Promise<void>((resolve) => {
+			img.onload = () => {
+				canvas.width = 1080;
+				canvas.height = (1080 / img.width) * img.height;
+				ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+				resolve();
+			};
+		});
+
 		try {
 			const snapshot = await uploadBytes(storageRef, blob);
 			const downloadURL = await getDownloadURL(snapshot.ref);

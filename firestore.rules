@@ -8,6 +8,10 @@ service cloud.firestore {
     function isApproved() {
       return get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.approved == true;
     }
+    
+    match /{document=**} {
+      allow read, write: if false;
+    }
 
     match /profiles/{userId} {
       allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());

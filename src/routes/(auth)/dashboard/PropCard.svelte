@@ -100,6 +100,15 @@
 		}
 	}
 
+	function checkImageName(image: string) {
+		// The image should have _1080x1920.jpg if it does not, fix it
+		if (image.includes('_1080x1920.jpg')) {
+			return image;
+		} else {
+			return image.replace('.jpg', '_1080x1920.jpg');
+		}
+	}
+
 	onMount(() => {
 		return () => {
 			clearInterval(intervalId);
@@ -131,8 +140,9 @@
 			>
 				{#each images as image, index}
 					{#if index === currentImageIndex}
+						
 						<img
-							src={image}
+							src={checkImageName(image)}
 							alt={`${prop.name || 'Prop'} image ${index + 1} of ${images.length}`}
 							class="object-cover w-full rounded-md"
 							in:fade={{ duration: 300 }}

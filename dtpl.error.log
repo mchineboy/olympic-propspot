@@ -1,0 +1,27 @@
+Error: 执行命令 CreateTemplateFilesCommand 出错: EACCES: permission denied, open '/Users/tyler.hardison_1/Projects/olympic-propspot/pkg/mod/google.golang.org/protobuf@v1.34.2/internal/conformance/failing_tests.txt'
+    at Object.writeFileSync (node:fs:2390:20)
+    at VscodeEditor.<anonymous> (/Users/tyler.hardison_1/.vscode/extensions/qiu8310.dot-template-vscode-0.4.0/out/adapter/VscodeEditor.js:169:28)
+    at step (/Users/tyler.hardison_1/.vscode/extensions/qiu8310.dot-template-vscode-0.4.0/node_modules/tslib/tslib.js:141:27)
+    at Object.next (/Users/tyler.hardison_1/.vscode/extensions/qiu8310.dot-template-vscode-0.4.0/node_modules/tslib/tslib.js:122:57)
+    at /Users/tyler.hardison_1/.vscode/extensions/qiu8310.dot-template-vscode-0.4.0/node_modules/tslib/tslib.js:115:75
+    at new Promise (<anonymous>)
+    at Object.__awaiter (/Users/tyler.hardison_1/.vscode/extensions/qiu8310.dot-template-vscode-0.4.0/node_modules/tslib/tslib.js:111:16)
+    at VscodeEditor.setFileContentAsync (/Users/tyler.hardison_1/.vscode/extensions/qiu8310.dot-template-vscode-0.4.0/out/adapter/VscodeEditor.js:159:24)
+    at CreateTemplateFilesCommand.<anonymous> (/Users/tyler.hardison_1/.vscode/extensions/qiu8310.dot-template-vscode-0.4.0/node_modules/dot-template-core/out/core/commands/Command.js:126:57)
+    at step (/Users/tyler.hardison_1/.vscode/extensions/qiu8310.dot-template-vscode-0.4.0/node_modules/dot-template-core/node_modules/tslib/tslib.js:133:27)
+    at Object.next (/Users/tyler.hardison_1/.vscode/extensions/qiu8310.dot-template-vscode-0.4.0/node_modules/dot-template-core/node_modules/tslib/tslib.js:114:57)
+    at /Users/tyler.hardison_1/.vscode/extensions/qiu8310.dot-template-vscode-0.4.0/node_modules/dot-template-core/node_modules/tslib/tslib.js:107:75
+    at new Promise (<anonymous>)
+    at Object.__awaiter (/Users/tyler.hardison_1/.vscode/extensions/qiu8310.dot-template-vscode-0.4.0/node_modules/dot-template-core/node_modules/tslib/tslib.js:103:16)
+    at CreateTemplateFilesCommand.Command.setFileContentAsync (/Users/tyler.hardison_1/.vscode/extensions/qiu8310.dot-template-vscode-0.4.0/node_modules/dot-template-core/out/core/commands/Command.js:118:24)
+    at CreateTemplateFilesCommand.<anonymous> (/Users/tyler.hardison_1/.vscode/extensions/qiu8310.dot-template-vscode-0.4.0/node_modules/dot-template-core/out/core/commands/CreateTemplateFilesCommand.js:77:71)
+    at step (/Users/tyler.hardison_1/.vscode/extensions/qiu8310.dot-template-vscode-0.4.0/node_modules/dot-template-core/node_modules/tslib/tslib.js:133:27)
+    at Object.next (/Users/tyler.hardison_1/.vscode/extensions/qiu8310.dot-template-vscode-0.4.0/node_modules/dot-template-core/node_modules/tslib/tslib.js:114:57)
+    at /Users/tyler.hardison_1/.vscode/extensions/qiu8310.dot-template-vscode-0.4.0/node_modules/dot-template-core/node_modules/tslib/tslib.js:107:75
+    at new Promise (<anonymous>)
+    at Object.__awaiter (/Users/tyler.hardison_1/.vscode/extensions/qiu8310.dot-template-vscode-0.4.0/node_modules/dot-template-core/node_modules/tslib/tslib.js:103:16)
+    at /Users/tyler.hardison_1/.vscode/extensions/qiu8310.dot-template-vscode-0.4.0/node_modules/dot-template-core/out/core/commands/CreateTemplateFilesCommand.js:48:107
+    at Object.<anonymous> (/Users/tyler.hardison_1/.vscode/extensions/qiu8310.dot-template-vscode-0.4.0/node_modules/dot-template-core/out/common/helper.js:37:62)
+    at step (/Users/tyler.hardison_1/.vscode/extensions/qiu8310.dot-template-vscode-0.4.0/node_modules/dot-template-core/node_modules/tslib/tslib.js:133:27)
+    at Object.next (/Users/tyler.hardison_1/.vscode/extensions/qiu8310.dot-template-vscode-0.4.0/node_modules/dot-template-core/node_modules/tslib/tslib.js:114:57)
+    at fulfilled (/Users/tyler.hardison_1/.vscode/extensions/qiu8310.dot-template-vscode-0.4.0/node_modules/dot-template-core/node_modules/tslib/tslib.js:104:62)

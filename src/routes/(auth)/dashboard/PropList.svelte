@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import type { Prop } from '$lib/propsStore';
 	import PropCard from './PropCard.svelte';
 	import PropDetailModal from './PropDetailModal.svelte';
@@ -18,21 +17,10 @@
 	let selectedProp: Prop | null = null;
 	let showModal = false;
 
-	$: {
-		console.log('PropList received props:', props);
-		page = 0;
-		displayedProps = [];
-		loadMoreProps();
-	}
-
-	function loadMoreProps() {
-		if (displayedProps.length < props.length) {
-			const newProps = props.slice(page * pageSize, (page + 1) * pageSize);
-			displayedProps = [...displayedProps, ...newProps];
-			page++;
-			console.log('Displayed props after loading more:', displayedProps);
-		}
-	}
+	$: displayedProps = [
+		...displayedProps,
+		...props.splice(pageSize * page, pageSize * (page + 1) + 1)
+	];
 
 	function handleViewProp(event: CustomEvent<Prop>) {
 		selectedProp = event.detail;
@@ -44,10 +32,6 @@
 	}
 
 	$: userPermissions = $session.user;
-
-	onMount(() => {
-		loadMoreProps();
-	});
 </script>
 
 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
@@ -62,8 +46,10 @@
 	{/each}
 	<InfiniteScroll
 		threshold={100}
-		hasMore={displayedProps.length < props.length}
-		on:loadMore={loadMoreProps}
+		on:loadMore={() => {
+			page++;
+			console.log('loading more props...');
+		}}
 	/>
 </div>
 

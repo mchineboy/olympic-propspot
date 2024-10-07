@@ -24,7 +24,6 @@
 	$: ({ loggedIn, user, loading } = $session);
 
 	onMount(() => {
-		console.log('Layout mounted');
 		initializeAuth().then(() => {
 			const unsubscribe = session.subscribe((cur) => {
 				loading = cur?.loading;
@@ -32,21 +31,15 @@
 				user = cur?.user;
 
 				if (loggedIn && user) {
-					console.log('Attempting to initialize Firebase');
 					const firebase = getFirebase();
 					if (firebase) {
-						console.log('Firebase initialized successfully');
 						if (!props.isInitialized()) {
-							console.log('Initializing props store');
 							props.init();
-						} else {
-							console.log('Props store already initialized');
 						}
 					} else {
 						console.error('Failed to initialize Firebase');
 					}
 				} else if (!loading && !loggedIn) {
-					console.log('User not logged in, redirecting to login');
 					goto('/login');
 				}
 			});

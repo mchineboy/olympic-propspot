@@ -2,9 +2,9 @@
 	import type { Prop } from '$lib/propsStore';
 	import PropCard from './PropCard.svelte';
 	import PropDetailModal from './PropDetailModal.svelte';
-	import InfiniteScroll from 'svelte-infinite-scroll';
 	import { session } from '$lib/session';
-
+	import InfiniteScroll from './InfiniteScroll.svelte';
+	
 	export let props: Prop[];
 	export const canUpdate: boolean = false;
 	export const canDelete: boolean = false;
@@ -34,7 +34,7 @@
 	$: userPermissions = $session.user;
 </script>
 
-<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4" id="scroll">
 	{#each displayedProps as prop (prop.id)}
 		<PropCard
 			{prop}
@@ -45,10 +45,11 @@
 		/>
 	{/each}
 	<InfiniteScroll
-		threshold={100}
+		hasMore={props.length > displayedProps.length}
+		threshold={1}
+		elementScroll={window}
 		on:loadMore={() => {
 			page++;
-			console.log('loading more props...');
 		}}
 	/>
 </div>

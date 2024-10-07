@@ -21,7 +21,6 @@
                 canUpdate: user.canUpdate,
                 canDelete: user.canDelete
             });
-            console.log('User updated:', user.uid);
         } catch (error) {
             console.error('Error updating user: ', error);
         }
@@ -29,7 +28,6 @@
 
     async function deleteUser(userId: string) {
         if (!userId || userId.length > 128) {
-            console.error('Invalid user ID');
             return;
         }
         try {
@@ -39,9 +37,7 @@
             
             // If the Cloud Function succeeds, remove the user from local state
             allUsers = allUsers.filter(user => user.uid !== userId);
-            console.log('User deleted:', userId);
         } catch (error) {
-            console.error('Error deleting user: ', error);
             alert('Error deleting user: ' + (error as Error).message);
         }
     }

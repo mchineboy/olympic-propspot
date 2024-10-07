@@ -19,11 +19,6 @@
 
 	$: sessionData = $session || defaultSession;
 	$: user = sessionData.user;
-	$: {
-        console.log('Session user:', $session.user);
-        console.log('Is administrator:', $session.user?.administrator);
-		console.log('Session data:', sessionData);
-    }
 </script>
 
 <nav class="bg-purple-900 shadow-lg">

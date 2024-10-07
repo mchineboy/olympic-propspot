@@ -58,7 +58,6 @@
 
     $: {
         allProps = $props;
-        console.log('Updated allProps:', allProps);
     }
 
     $: sortedProps = sortProps(allProps, sortOption);
@@ -76,10 +75,6 @@
                 );
             });
         return typeMatch && freeformMatch;
-    });
-
-    onMount(() => {
-        console.log('Component mounted');
     });
 
     function sortProps(props: Prop[], option: string): Prop[] {

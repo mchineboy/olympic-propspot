@@ -47,11 +47,9 @@ function initializeFirebase() {
 
 export function getFirebase() {
   if (!browser) {
-    console.log("Can't use Firebase on the server.");
     return null;
   }
   const instance = initializeFirebase();
-  console.log("Firebase initialized:", instance ? "success" : "failed");
   return instance;
 }
 

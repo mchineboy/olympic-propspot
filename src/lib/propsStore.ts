@@ -140,25 +140,18 @@ function propsStore() {
 
         // Initialize store
         init: () => {
-            console.log("Props store init called");
             if (unsubscribe) {
-              console.warn('Store is already initialized. Call stop() before reinitializing.');
               return;
             }
             const firebase = getFirebase();
             if (!firebase) {
-              console.error("Firebase is not initialized in props store init");
               throw new Error("Firebase is not initialized");
             }
-            console.log("Setting up Firestore listener");
             unsubscribe = onSnapshot(collection(firebase.db, "props"), (snapshot) => {
-              console.log("Firestore snapshot received", snapshot.size);
               const props: Prop[] = [];
               snapshot.forEach((doc) => {
-                console.log("Document data:", doc.data());
                 props.push({ ...doc.data(), id: doc.id } as Prop);
               });
-              console.log('Fetched props:', props);
               set(props);
             }, (error) => {
               console.error("Firestore listener error:", error);

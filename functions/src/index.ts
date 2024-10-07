@@ -24,8 +24,6 @@ export const deleteUserV2 = onRequest({cors: true}, async (request, response) =>
     return;
   }
 
-  console.log('Request body:', JSON.stringify(request.body, null, 2));
-
   const { data } = request.body;
   const { uid } = data;
   

@@ -24,12 +24,16 @@
 	function nextImage() {
 		if (currentImageIndex < images.length - 1) {
 			currentImageIndex++;
+		} else {
+			currentImageIndex = 0;
 		}
 	}
 
 	function prevImage() {
 		if (currentImageIndex > 0) {
 			currentImageIndex--;
+		} else {
+			currentImageIndex = images.length - 1;
 		}
 	}
 

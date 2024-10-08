@@ -2,6 +2,7 @@
 	import { fade, fly } from 'svelte/transition';
 	import type { Prop } from '$lib/propsStore';
 	import { createEventDispatcher, onDestroy } from 'svelte';
+	import { fixImageUrl } from '$lib/utils';
 
 	export let prop: Prop;
 	export let show: boolean = false;
@@ -34,15 +35,6 @@
 			currentImageIndex--;
 		} else {
 			currentImageIndex = images.length - 1;
-		}
-	}
-
-	function fixImageUrl(image: string): string {
-		// The image should have _1080x1920.jpg if it does not, fix it
-		if (image.includes('_1080x1920.jpg')) {
-			return image;
-		} else {
-			return image.replace('.jpg', '_1080x1920.jpg');
 		}
 	}
 

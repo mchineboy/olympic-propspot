@@ -1,5 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
+  import { fixImageUrl } from '$lib/utils';
 
   export let images: string[] = [];
   export let ariaLabel: string = '';
@@ -54,7 +55,7 @@
   <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
     {#each images as image, index}
       <div class="relative">
-        <img src={image} alt="Selected prop" class="object-cover w-full h-32 rounded" />
+        <img src={fixImageUrl(image)} alt="Selected prop" class="object-cover w-full h-32 rounded" />
         <button
           type="button"
           on:click={() => removeImage(index)}

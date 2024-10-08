@@ -3,6 +3,7 @@
 	import { createEventDispatcher, onMount } from 'svelte';
 	import { props } from '$lib/propsStore';
 	import { fade } from 'svelte/transition';
+	import { fixImageUrl } from '$lib/utils';
 
 	export let prop: Prop;
 	export let canUpdate: boolean = false;
@@ -100,15 +101,6 @@
 		}
 	}
 
-	function checkImageName(image: string) {
-		// The image should have _1080x1920.jpg if it does not, fix it
-		if (image.includes('_1080x1920.jpg')) {
-			return image;
-		} else {
-			return image.replace('.jpg', '_1080x1920.jpg');
-		}
-	}
-
 	onMount(() => {
 		return () => {
 			clearInterval(intervalId);
@@ -142,7 +134,7 @@
 					{#if index === currentImageIndex}
 						
 						<img
-							src={checkImageName(image)}
+							src={fixImageUrl(image)}
 							alt={`${prop.name || 'Prop'} image ${index + 1} of ${images.length}`}
 							class="object-cover w-full rounded-md"
 							in:fade={{ duration: 300 }}

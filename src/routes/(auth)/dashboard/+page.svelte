@@ -11,11 +11,18 @@
     let selectedType = 'All';
     let unsubscribe: (() => void) | undefined;
 
+    let allProps: Prop[] = [];
+    let displayedProps: Prop[] = [];
+    let page = 0;
+    const pageSize = 20;
+
     onMount(() => {
         const initPrefs = async () => {
             const sessionData = get(session);
             if (sessionData.loggedIn && sessionData.user) {
-                const userPrefs = await prefs.getUserPrefs(sessionData.user.uid);
+                const userPrefs = await prefs.getUserPrefs(
+                    sessionData.user.uid
+                );
                 if (userPrefs) {
                     selectedType = userPrefs.defaultPropType || 'All';
                 }
@@ -39,7 +46,39 @@
         selectedType = $prefs.defaultPropType || 'All';
     }
 
-    let allProps: Prop[] = [];
+    $: {
+        allProps = $props;
+        resetDisplayedProps();
+    }
+
+    $: sortedAndFilteredProps = sortProps(filteredProps, sortOption);
+
+    $: {
+        selectedType;
+        freeformFilter;
+        sortOption;
+        sortedAndFilteredProps;
+        resetDisplayedProps();
+    }
+    
+    function resetDisplayedProps() {
+        page = 0;
+        if (!sortedAndFilteredProps) {
+            displayedProps = [];
+            return;
+        } 
+        displayedProps = sortedAndFilteredProps.slice(0, pageSize);
+    }
+
+    function loadMoreProps() {
+        page++;
+        if (!sortedAndFilteredProps) {
+            return;
+        }
+        const newProps = sortedAndFilteredProps.slice(page * pageSize, (page + 1) * pageSize);
+        displayedProps = [...displayedProps, ...newProps];
+    }
+
     let sortOption = 'lastUsed-desc';
     let isAddDialogOpen = false;
     let editingProp: Prop | null = null;
@@ -153,8 +192,9 @@
     </div>
 
     <PropList
-        props={filteredProps}
+        props={displayedProps}
         on:edit={openEditDialog}
+        on:loadMore={loadMoreProps}
         canUpdate={userPermissions?.canUpdate}
         canDelete={userPermissions?.canDelete}
     />

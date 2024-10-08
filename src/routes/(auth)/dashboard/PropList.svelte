@@ -3,24 +3,16 @@
 	import PropCard from './PropCard.svelte';
 	import PropDetailModal from './PropDetailModal.svelte';
 	import { session } from '$lib/session';
+	import { createEventDispatcher } from 'svelte';
 	import InfiniteScroll from './InfiniteScroll.svelte';
-	
+
 	export let props: Prop[];
 	export const canUpdate: boolean = false;
 	export const canDelete: boolean = false;
 	export const canCreate: boolean = false;
-
-	let displayedProps: Prop[] = [];
-	let page = 0;
-	const pageSize = 20;
-
 	let selectedProp: Prop | null = null;
+	const dispatch = createEventDispatcher();
 	let showModal = false;
-
-	$: displayedProps = [
-		...displayedProps,
-		...props.splice(pageSize * page, pageSize * (page + 1) + 1)
-	];
 
 	function handleViewProp(event: CustomEvent<Prop>) {
 		selectedProp = event.detail;
@@ -31,11 +23,17 @@
 		showModal = false;
 	}
 
+	function loadMore() {
+		// Dispatch an event to the parent component to load more props
+		console.log('load more');
+		dispatch('loadMore');
+	}
+
 	$: userPermissions = $session.user;
 </script>
 
 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4" id="scroll">
-	{#each displayedProps as prop (prop.id)}
+	{#each props as prop (prop.id)}
 		<PropCard
 			{prop}
 			on:edit
@@ -45,11 +43,12 @@
 		/>
 	{/each}
 	<InfiniteScroll
-		hasMore={props.length > displayedProps.length}
+		hasMore={true}
 		threshold={1}
 		elementScroll={window}
 		on:loadMore={() => {
-			page++;
+			console.log('load more');
+			loadMore();
 		}}
 	/>
 </div>
